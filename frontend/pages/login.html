@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Login - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <script src="../js/login.js"></script>
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="/pages/search.html">SEARCH FOR MENTORS</a>
+            <a href="/pages/regMentor.html">WORK WITH US</a>
+        </nav>
+    </header>
+
+    <div class="login-container">
+        <div class="form-section">
+            <div class="form-title">Welcome Back</div>
+            <div class="form-subtitle">Log in to your account</div>
+
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="email" class="form-input" placeholder="your.email@example.com" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <input type="password" id="password" class="form-input" placeholder="Enter your password" required />
+                <div class="forgot-password">
+                    <a href="#">Forgot password?</a>
+                </div>
+            </div>
+
+            <button id="submitBtn" class="submit-btn">Log In</button>
+
+            <div class="signup-link">
+                Don't have an account? <a href="regMentee.html">Sign up as Mentee</a>
+            </div>
+            <div class="signup-link" style="margin-top: 10px;">
+                Are you a mentor? <a href="regMentor.html">Apply here</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

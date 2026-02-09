@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>MentorMatch - Find Your Perfect Mentor</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <!-- HEADER -->
+    <header id="header">
+        <img class="logo" alt="MentorMatch Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="#features">FEATURES</a>
+            <a href="#categories">CATEGORIES</a>
+            <a href="#mentors">MENTORS</a>
+            <a href="/pages/login.html" class="btn btn-primary" style="padding: 10px 24px; font-size: 14px;">LOGIN</a>
+        </nav>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero-main">
+        <div class="hero-background"></div>
+        
+        <div class="floating-element airplane-1">✈️</div>
+        <div class="floating-element airplane-2">✈️</div>
+        
+        <div class="hero-content">
+            <h1 class="hero-title">Find Your Perfect Mentor</h1>
+            <p class="hero-subtitle">Connect with experienced professionals who can guide you to success</p>
+            <div class="cta-buttons">
+                <a href="/pages/regMentee.html" class="btn btn-primary">Become a Mentee</a>
+                <a href="/pages/search.html" class="btn">Find a Mentor</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- WAVE -->
+    <div class="wave-section">
+        <svg class="wave-image" viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,50 C300,90 600,10 900,50 C1100,80 1200,50 1200,50 L1200,120 L0,120 Z" fill="#a8d5ba" opacity="0.3"/>
+            <path d="M0,60 C300,20 600,100 900,60 C1100,30 1200,60 1200,60 L1200,120 L0,120 Z" fill="#a8d5ba" opacity="0.5"/>
+            <path d="M0,70 C300,110 600,30 900,70 C1100,100 1200,70 1200,70 L1200,120 L0,120 Z" fill="#a8d5ba"/>
+        </svg>
+    </div>
+
+    <!-- FEATURES SECTION -->
+    <section class="features-section" id="features">
+        <h2 class="section-title reveal">Why Choose MentorMatch?</h2>
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon">🎯</div>
+                <h3 class="feature-title">Perfect Match</h3>
+                <p class="feature-description">Find the perfect mentor from over 100 different categories.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">💼</div>
+                <h3 class="feature-title">Expert Mentors</h3>
+                <p class="feature-description">Learn from verified professionals with years of industry experience</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">📅</div>
+                <h3 class="feature-title">Flexible Scheduling</h3>
+                <p class="feature-description">Book sessions at your convenience with our easy-to-use calendar system</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORIES SECTION -->
+    <section class="categories-section" id="categories">
+        <div class="categories-container">
+            <h2 class="section-title reveal">We've Got You Covered In</h2>
+            <div class="blobs-container">
+                <div class="blob reveal">Education</div>
+                <div class="blob reveal">Career</div>
+                <div class="blob reveal">Start-Ups</div>
+                <div class="blob reveal">Technology</div>
+                <div class="blob reveal">Business</div>
+                <div class="blob reveal">Creative Arts</div>
+            </div>
+            <p class="footer-text reveal" style="font-size: 20px; margin-top: 40px;">And much more...</p>
+        </div>
+    </section>
+
+    <!-- STATS SECTION -->
+    <section class="stats-section reveal">
+        <h2 class="section-title" style="color: white;">Join Thousands of Success Stories</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-target="5000">0</div>
+                <div class="stat-label">Active Mentors</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="50000">0</div>
+                <div class="stat-label">Happy Mentees</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="100000">0</div>
+                <div class="stat-label">Sessions Completed</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="98">0</div>
+                <div class="stat-label">% Satisfaction Rate</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="cta-section reveal" id="mentors">
+        <h2 class="cta-title">Interested in joining as a mentor?</h2>
+        <p class="cta-description">Sign up today and start sharing your expertise with eager learners.</p>
+        <div class="cta-buttons">
+            <a href="/pages/regMentor.html" class="btn btn-primary">Become a Mentor</a>
+        </div>
+    </section>
+
+    <script>
+        // Scroll reveal animation
+        function reveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            reveals.forEach(element => {
+                const windowHeight = window.innerHeight;
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    element.classList.add('active');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', reveal);
+        reveal();
+
+        // Header scroll effect
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('header');
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Counter animation
+        function animateCounter(element) {
+            const target = parseInt(element.getAttribute('data-target'));
+            const duration = 2000;
+            const increment = target / (duration / 16);
+            let current = 0;
+
+            const updateCounter = () => {
+                current += increment;
+                if (current < target) {
+                    element.textContent = Math.floor(current).toLocaleString();
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    element.textContent = target.toLocaleString() + (element.parentElement.querySelector('.stat-label').textContent.includes('%') ? '%' : '');
+                }
+            };
+
+            updateCounter();
+        }
+
+        // Trigger counter animation when stats section is visible
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumbers = entry.target.querySelectorAll('.stat-number');
+                    statNumbers.forEach(num => {
+                        if (!num.classList.contains('animated')) {
+                            animateCounter(num);
+                            num.classList.add('animated');
+                        }
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        const statsSection = document.querySelector('.stats-section');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#' && href.length > 1) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

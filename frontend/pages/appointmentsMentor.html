@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My Appointments - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+        .calendar-container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header h2 {
+            font-size: 24px;
+            color: #333;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            padding: 8px 16px;
+            background: #4A90E2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .calendar-nav button:hover {
+            background: #357ABD;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+
+        .calendar-day {
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .calendar-day:hover {
+            background: #f9f9f9;
+        }
+
+        .calendar-day.other-month {
+            background: #fafafa;
+            color: #999;
+        }
+
+        .calendar-day-number {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .calendar-day.today {
+            background: #E3F2FD;
+            border-color: #4A90E2;
+        }
+
+        .appointment-item {
+            font-size: 11px;
+            padding: 4px 6px;
+            margin: 2px 0;
+            border-radius: 3px;
+            cursor: pointer;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .appointment-item:hover {
+            opacity: 0.8;
+        }
+
+        .appointment-item.confermato {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .appointment-item.attesa {
+            background: #FF9800;
+            color: white;
+        }
+
+        .appointment-item.completato {
+            background: #2196F3;
+            color: white;
+        }
+
+        .appointment-item.annullato {
+            background: #f44336;
+            color: white;
+        }
+
+        /* Modal per i dettagli appuntamento */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #333;
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            margin: 15px 0;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            min-width: 120px;
+            color: #666;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .status-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+
+        .status-selector label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .status-selector select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-actions button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-save {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #45a049;
+        }
+
+        .btn-cancel {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #da190b;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="/pages/notification.html">NOTIFICATIONS</a>
+            <a href="#">LOGOUT</a>
+        </nav>
+    </header>
+
+    <div class="sidebar">
+        <a href="dashboardMentor.html">Dashboard</a>
+        <a href="avMentor.html">Availability</a>
+        <a href="chat.html">Messages</a>
+        <a href="#" class="active">Appointments</a>
+        <a href="reviewsMentor.html">Reviews</a>
+        <a href="#">Earnings</a>
+    </div>
+
+    <div class="dashboard-container" style="margin-left: 220px;">
+        <div class="calendar-container">
+            <div class="calendar-header">
+                <h2 id="current-month-year">January 2026</h2>
+                <div class="calendar-nav">
+                    <button id="prev-month">← Previous</button>
+                    <button id="today-btn">Today</button>
+                    <button id="next-month">Next →</button>
+                </div>
+            </div>
+
+            <div class="calendar-grid" id="calendar-grid">
+                <!-- Calendar will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal per dettagli appuntamento -->
+    <div id="appointment-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Appointment Details</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="detail-row">
+                    <span class="detail-label">Mentee:</span>
+                    <span class="detail-value" id="modal-mentee"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Date:</span>
+                    <span class="detail-value" id="modal-date"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Time:</span>
+                    <span class="detail-value" id="modal-time"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Duration:</span>
+                    <span class="detail-value" id="modal-duration"></span>
+                </div>
+                
+                <div class="status-selector">
+                    <label for="status-select">Update Status:</label>
+                    <select id="status-select">
+                        <option value="In attesa">In attesa</option>
+                        <option value="Confermato">Confermato</option>
+                        <option value="Completato">Completato</option>
+                        <option value="Annullato">Annullato</option>
+                        <option value="Rifiutato">Rifiutato</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="close-modal">Close</button>
+                <button class="btn-save" id="save-status">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/appointmentsMentor.js"></script>
+</body>
+</html>

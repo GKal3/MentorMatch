@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Reviews - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="/pages/dashboardMentor.html">DASHBOARD</a>
+            <a href="/pages/chat.html">MESSAGES</a>
+            <a href="#logout">LOGOUT</a>
+        </nav>
+    </header>
+
+    <div class="reviews-container">
+        <div class="page-title">My Reviews & Ratings</div>
+
+        <section class="stats-header">
+            <div class="overall-rating">
+                <div id="avgRating" class="big-rating">0.0</div>
+                <div id="avgStars" class="stars-display">☆☆☆☆☆</div>
+                <div class="stat-label" id="reviewCountLabel">Based on 0 reviews</div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div id="totalReviews" class="stat-number">0</div>
+                    <div class="stat-label">Total Reviews</div>
+                </div>
+                <div class="stat-box">
+                    <div id="fiveStarCount" class="stat-number">0</div>
+                    <div class="stat-label">5-Star Reviews</div>
+                </div>
+                <div class="stat-box">
+                    <div id="fourStarCount" class="stat-number">0</div>
+                    <div class="stat-label">4-Star Reviews</div>
+                </div>
+                <div class="stat-box">
+                    <div id="threeStarCount" class="stat-number">0</div>
+                    <div class="stat-label">3 Stars or less</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="rating-breakdown">
+            <div class="section-title">Rating Breakdown</div>
+
+            <div class="breakdown-item">
+                <div class="breakdown-label">5 Stars</div>
+                <div class="breakdown-bar-container"><div id="bar5" class="breakdown-bar" style="width: 0%;"></div></div>
+                <div id="val5" class="breakdown-value">0</div>
+            </div>
+            <div class="breakdown-item">
+                <div class="breakdown-label">4 Stars</div>
+                <div class="breakdown-bar-container"><div id="bar4" class="breakdown-bar" style="width: 0%;"></div></div>
+                <div id="val4" class="breakdown-value">0</div>
+            </div>
+            <div class="breakdown-item">
+                <div class="breakdown-label">3 Stars</div>
+                <div class="breakdown-bar-container"><div id="bar3" class="breakdown-bar" style="width: 0%;"></div></div>
+                <div id="val3" class="breakdown-value">0</div>
+            </div>
+            <div class="breakdown-item">
+                <div class="breakdown-label">2 Stars</div>
+                <div class="breakdown-bar-container"><div id="bar2" class="breakdown-bar" style="width: 0%;"></div></div>
+                <div id="val2" class="breakdown-value">0</div>
+            </div>
+            <div class="breakdown-item">
+                <div class="breakdown-label">1 Star</div>
+                <div class="breakdown-bar-container"><div id="bar1" class="breakdown-bar" style="width: 0%;"></div></div>
+                <div id="val1" class="breakdown-value">0</div>
+            </div>
+        </section>
+
+        <div class="filters-section">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="5">5 Stars</button>
+            <button class="filter-btn" data-filter="4">4 Stars</button>
+            <button class="filter-btn" data-filter="3">3 Stars</button>
+            <button class="filter-btn" data-filter="2">2 Stars</button>
+            <button class="filter-btn" data-filter="1">1 Star</button>
+        </div>
+
+        <section class="reviews-list">
+            <div class="section-title">Recent Reviews</div>
+            <div id="reviewsEmpty" class="empty-state">No reviews yet.</div>
+            <div id="reviewsItems"></div>
+        </section>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/reviewsMentor.js"></script>
+</body>
+</html>

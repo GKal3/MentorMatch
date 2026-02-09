@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Earnings - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="/pages/notification.html">NOTIFICATIONS</a>
+            <a href="#">LOGOUT</a>
+        </nav>
+    </header>
+
+    <div class="sidebar">
+        <a href="dashboardMentor.html">Dashboard</a>
+        <a href="avMentor.html">Availability</a>
+        <a href="chat.html">Messages</a>
+        <a href="appointmentsMentor.html">Appointments</a>
+        <a href="reviewsMentor.html">Reviews</a>
+        <a href="earnings.html" class="active">Earnings</a>
+        <a href="#">My Profile</a>
+    </div>
+
+    <div class="dashboard-container" style="margin-left: 220px;">
+        <div class="welcome-section">
+            <h1>Earnings</h1>
+            <p style="color: #666;">View all your received payments</p>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom: 30px;">
+            <div class="stat-card">
+                <div class="stat-value" id="total-earnings">€0.00</div>
+                <div class="stat-label">Total Earnings</div>
+            </div>
+        </div>
+
+        <div id="loading" style="text-align: center; padding: 40px;">
+            <p>Loading earnings...</p>
+        </div>
+
+        <div id="no-earnings" style="display: none; text-align: center; padding: 40px;">
+            <p style="color: #666;">No earnings yet</p>
+        </div>
+
+        <div id="earnings-list" class="payments-container"></div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/earnings.js"></script>
+</body>
+</html>

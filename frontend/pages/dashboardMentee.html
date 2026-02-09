@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mentee Dashboard - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <script src="../js/utils.js"></script>
+    <script src="../js/dashboardMentee.js"></script>
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="/pages/notification.html">NOTIFICATIONS</a>
+            <a href="#">LOGOUT</a>
+        </nav>
+    </header>
+
+    <div class="sidebar">
+        <a href="#" class="active">Dashboard</a>
+        <a href="appArea.html">My Sessions</a>
+        <a href="chat.html">Messages</a>
+        <a href="search.html">Find Mentors</a>
+        <a href="#">My Profile</a>
+        <a href="paymentHistory.html">Payment History</a>
+    </div>
+
+    <div class="dashboard-container" style="margin-left: 220px;">
+        <div class="welcome-section">
+            <h1 id="greeting" style="margin-bottom: 10px;">Welcome, Mentee!</h1>
+            <p style="color: #666;">Continue your learning journey</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="active-mentors">0</div>
+                <div class="stat-label">Active Mentors</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="sessions-completed">0</div>
+                <div class="stat-label">Sessions Completed</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="upcoming-sessions">0</div>
+                <div class="stat-label">Upcoming Sessions</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="learning-time">0h</div>
+                <div class="stat-label">Total Learning Time</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Upcoming Sessions</div>
+            <p id="no-appointments" style="color: #666;">No upcoming sessions</p>
+        </div>
+    </div>
+</body>
+</html>

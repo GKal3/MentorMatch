@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Search Mentors - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <script src="../js/searchMentors.js"></script>
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="/pages/search.html">SEARCH FOR MENTORS</a>
+            <a href="/pages/regMentor.html">WORK WITH US</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Find Your Perfect Mentor</h1>
+    </section>
+
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" class="search-input" placeholder="Search by name, skills, or expertise..." />
+            <button class="search-btn">Search</button>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>Category</label>
+                <select name="category">
+                    <option>All Categories</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Language</label>
+                <select name="language">
+                    <option>All Languages</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Price Range</label>
+                <select name="price">
+                    <option>All Prices</option>
+                    <option>€0 - €50</option>
+                    <option>€50 - €100</option>
+                    <option>€100+</option>
+                </select>
+            </div>
+        </div>
+
+        <h3 style="text-align: center; margin: 30px 0;">Popular Categories</h3>
+        <div class="categories">
+            <div class="category-chip active">Education</div>
+            <div class="category-chip">Career</div>
+            <div class="category-chip">Start-Ups</div>
+            <div class="category-chip">Technology</div>
+            <div class="category-chip">Marketing</div>
+            <div class="category-chip">Finance</div>
+        </div>
+    </div>
+
+</body>
+</html>

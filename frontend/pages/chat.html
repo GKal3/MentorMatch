@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Messages - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="javascript:void(0)" id="dashboard-link">DASHBOARD</a>
+            <a href="/pages/notification.html">NOTIFICATIONS</a>
+            <a href="#">LOGOUT</a>
+        </nav>
+    </header>
+
+    <div class="messages-container">
+        <div class="chat-layout">
+            <div class="conversations-list">
+                <div class="conversations-header">Messages</div>
+                <div id="conversations-container"></div>
+            </div>
+
+            <div class="chat-area">
+                <div class="chat-header" id="chat-header" style="display: none;">
+                    <div class="chat-header-avatar" id="header-avatar"></div>
+                    <div class="chat-header-info">
+                        <div class="chat-header-name" id="header-name"></div>
+                        <div class="chat-header-status">Online</div>
+                    </div>
+                </div>
+
+                <div class="messages-area" id="messages-area">
+                    <p style="text-align: center; color: #666; margin-top: 100px;">Select a conversation to start messaging</p>
+                </div>
+
+                <div class="chat-input-area" id="chat-input-area" style="display: none;">
+                    <input type="text" id="message-input" class="chat-input" placeholder="Type your message..." />
+                    <button class="send-btn" id="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/chat.js"></script>
+</body>
+</html>

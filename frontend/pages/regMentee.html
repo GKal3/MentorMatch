@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sign Up - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <script src="../js/regMentee.js"></script>
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="/pages/search.html">SEARCH FOR MENTORS</a>
+            <a href="/pages/regMentor.html">WORK WITH US</a>
+        </nav>
+    </header>
+
+    <div class="register-container">
+        <div class="form-section">
+            <div class="form-title">Join MentorMatch</div>
+            <div class="form-subtitle">Start your learning journey today</div>
+
+            <div class="form-group">
+                <label class="form-label">First Name *</label>
+                <input type="text" id="firstName" class="form-input" placeholder="Enter your first name" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Last Name *</label>
+                <input type="text" id="lastName" class="form-input" placeholder="Enter your last name" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Email *</label>
+                <input type="email" id="email" class="form-input" placeholder="your.email@example.com" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Date of Birth *</label>
+                <input type="date" id="birthDate" class="form-input" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Gender *</label>
+                <select id="gender" class="form-select" required>
+                    <option value="">Select gender</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                    <option value="Altro">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Password *</label>
+                <input type="password" id="password" class="form-input" placeholder="Create a strong password" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Confirm Password *</label>
+                <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm your password" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Current Occupation *</label>
+                <input type="text" id="occupation" class="form-input" placeholder="e.g., Student, Professional, Entrepreneur" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Tell us about yourself (Optional)</label>
+                <textarea id="bio" class="form-textarea" placeholder="What are your goals and what would you like to learn?"></textarea>
+            </div>
+
+            <button id="submitBtn" class="submit-btn">Create Account</button>
+
+            <div class="terms">
+                By creating an account, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+            </div>
+
+            <p style="text-align: center; margin-top: 20px; color: #666;">
+                Already have an account? <a href="login.html" style="color: var(--green); font-weight: 600;">Log in</a>
+            </p>
+
+            <p style="text-align: center; margin-top: 15px; color: #666;">
+                Want to become a mentor? <a href="regMentor.html" style="color: var(--green); font-weight: 600;">Apply here</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

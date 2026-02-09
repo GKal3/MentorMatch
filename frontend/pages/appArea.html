@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My Sessions - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="dashboardMentee.html">DASHBOARD</a>
+            <a href="chat.html">MESSAGES</a>
+            <a href="#">LOGOUT</a>
+        </nav>
+    </header>
+
+    <div class="appointments-container">
+        <h1 style="text-align: center; margin-bottom: 30px;">My Sessions</h1>
+
+        <div class="tabs-navigation">
+            <button class="tab-btn active" data-target="upcomingSection">Upcoming</button>
+            <button class="tab-btn" data-target="pastSection">Past Sessions</button>
+            <button class="tab-btn" data-target="cancelledSection">Cancelled</button>
+        </div>
+
+        <div id="upcomingSection" class="appointments-section">
+            <div class="section-title">Upcoming Sessions (<span id="count-upcoming">0</span>)</div>
+            <div class="sessions-list" id="list-upcoming"></div>
+            <div class="empty-state" id="empty-upcoming" style="display:none;">
+                <div class="empty-icon">📅</div>
+                <div>No upcoming sessions</div>
+            </div>
+        </div>
+
+        <div id="pastSection" class="appointments-section" style="display:none;">
+            <div class="section-title">Past Sessions (<span id="count-past">0</span>)</div>
+            <div class="sessions-list" id="list-past"></div>
+            <div class="empty-state" id="empty-past" style="display:none;">
+                <div class="empty-icon">🕒</div>
+                <div>No past sessions</div>
+            </div>
+        </div>
+
+        <div id="cancelledSection" class="appointments-section" style="display:none;">
+            <div class="section-title">Cancelled Sessions (<span id="count-cancelled">0</span>)</div>
+            <div class="sessions-list" id="list-cancelled"></div>
+            <div class="empty-state" id="empty-cancelled" style="display:none;">
+                <div class="empty-icon">❌</div>
+                <div>No cancelled sessions</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/appArea.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Mentor Dashboard - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="/pages/notification.html">NOTIFICATIONS</a>
+            <a href="#">LOGOUT</a>
+        </nav>
+    </header>
+
+    <div class="sidebar">
+        <a href="#" class="active">Dashboard</a>
+        <a href="avMentor.html">Availability</a>
+        <a href="chat.html">Messages</a>
+        <a href="appointmentsMentor.html">Appointments</a>
+        <a href="reviewsMentor.html">Reviews</a>
+        <a href="earnings.html">Earnings</a>
+        <a href="#">My Profile</a>
+    </div>
+
+    <div class="dashboard-container" style="margin-left: 220px;">
+        <div class="welcome-section">
+            <div>
+                <h1 id="greeting" style="margin-bottom: 5px;">Welcome, Mentor!</h1>
+                <p style="color: #666;">Here's what's happening with your mentoring today</p>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="price">€0/h</div>
+                <div class="stat-label">Hourly Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="rating">0 ⭐</div>
+                <div class="stat-label">Average Rating</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="reviews">0</div>
+                <div class="stat-label">Total Reviews</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="upcoming">0</div>
+                <div class="stat-label">Upcoming Sessions</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Upcoming Sessions</div>
+            <p id="no-appointments" style="color: #666;">No upcoming appointments</p>
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/dashboardMentor.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Payment - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="dashboardMentee.html">DASHBOARD</a>
+            <a href="#">LOGOUT</a>
+        </nav>
+    </header>
+
+    <div class="payment-container">
+        <h1 style="text-align: center; margin-bottom: 30px;">Complete Your Payment</h1>
+
+        <div class="payment-layout">
+            <div>
+                <div class="payment-methods">
+                    <div class="section-title">Payment Method</div>
+
+                    <div class="payment-tabs">
+                        <div class="payment-tab active" id="cardTab">
+                            <span class="payment-icon">💳</span>
+                            <span>Credit Card</span>
+                        </div>
+                        <div class="payment-tab" id="paypalTab">
+                            <span class="payment-icon">🅿️</span>
+                            <span>PayPal</span>
+                        </div>
+                    </div>
+
+                    <div id="cardSection">
+                        <div class="card-display">
+                            <div style="font-size: 12px; opacity: 0.9;">CREDIT CARD</div>
+                            <div class="card-number">•••• •••• •••• ••••</div>
+                            <div class="card-info">
+                                <div>
+                                    <div style="font-size: 10px; opacity: 0.8;">CARDHOLDER</div>
+                                    <div>YOUR NAME</div>
+                                </div>
+                                <div>
+                                    <div style="font-size: 10px; opacity: 0.8;">EXPIRES</div>
+                                    <div>MM/YY</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Cardholder Name *</label>
+                            <input type="text" class="form-input" placeholder="Name as it appears on card" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Card Number *</label>
+                            <input type="text" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19" />
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Expiry Date *</label>
+                                <input type="text" class="form-input" placeholder="MM/YY" maxlength="5" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">CVV *</label>
+                                <input type="text" class="form-input" placeholder="123" maxlength="4" />
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Billing Address</label>
+                            <input type="text" class="form-input" placeholder="Street address" />
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">City</label>
+                                <input type="text" class="form-input" placeholder="City" />
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Postal Code</label>
+                                <input type="text" class="form-input" placeholder="12345" />
+                            </div>
+                        </div>
+
+                        <div class="security-info">
+                            <span>🔒</span>
+                            <span>Your payment information is encrypted and secure</span>
+                        </div>
+                    </div>
+
+                    <div id="paypalSection" class="paypal-section">
+                        <div style="font-size: 60px; margin-bottom: 20px;">🅿️</div>
+                        <h3 style="margin-bottom: 15px;">Pay with PayPal</h3>
+                        <p style="color: #666; margin-bottom: 25px;">
+                            You will be redirected to PayPal to complete your payment securely.
+                        </p>
+                        <button class="paypal-btn">Continue to PayPal</button>
+                        <div class="security-info" style="margin-top: 20px;">
+                            <span>🔒</span>
+                            <span>Secure payment powered by PayPal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="order-summary">
+                    <div class="section-title">Order Summary</div>
+
+                    <div class="summary-mentor">
+                        <div class="summary-avatar">AM</div>
+                        <div class="summary-mentor-info">
+                            <div class="summary-mentor-name">Anna Martinez</div>
+                            <div class="summary-mentor-date">Jan 24, 2026 at 2:00 PM</div>
+                            <div class="summary-mentor-date">60 min session</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Session Price</span>
+                        <span>€75.00</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Platform Fee</span>
+                        <span>€5.00</span>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Tax (VAT 22%)</span>
+                        <span>€17.60</span>
+                    </div>
+
+                    <div class="summary-total">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Total</span>
+                            <span>€97.60</span>
+                        </div>
+                    </div>
+
+                    <button class="submit-payment-btn" id="submitPayment">Complete Payment</button>
+
+                    <p style="font-size: 12px; color: #666; margin-top: 15px; text-align: center;">
+                        By completing this purchase you agree to our <a href="#" style="color: var(--green);">Terms of Service</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/payment.js"></script>
+</body>
+</html>

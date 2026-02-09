@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Availability Calendar - MentorMatch</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="dashboardMentor.html">DASHBOARD</a>
+            <a href="messages.html">MESSAGES</a>
+            <a href="#">LOGOUT</a>
+        </nav>
+    </header>
+
+    <div class="availability-container">
+        <h1 style="text-align: center; margin-bottom: 30px;">Gestione Disponibilità Settimanale</h1>
+
+        <div class="calendar-section">
+            <div class="calendar-header">
+                <h2 id="current-month">Disponibilità Settimanale Ricorrente</h2>
+                <p style="color: #666; font-size: 14px; margin-top: 10px;">Seleziona i giorni della settimana e gli orari in cui sei disponibile</p>
+            </div>
+            
+            <div class="weekdays-grid" id="weekdays-grid">
+                <div class="weekday-card" data-day="Lunedì">
+                    <div class="weekday-header">Lunedì</div>
+                    <div class="weekday-indicator"></div>
+                </div>
+                <div class="weekday-card" data-day="Martedì">
+                    <div class="weekday-header">Martedì</div>
+                    <div class="weekday-indicator"></div>
+                </div>
+                <div class="weekday-card" data-day="Mercoledì">
+                    <div class="weekday-header">Mercoledì</div>
+                    <div class="weekday-indicator"></div>
+                </div>
+                <div class="weekday-card" data-day="Giovedì">
+                    <div class="weekday-header">Giovedì</div>
+                    <div class="weekday-indicator"></div>
+                </div>
+                <div class="weekday-card" data-day="Venerdì">
+                    <div class="weekday-header">Venerdì</div>
+                    <div class="weekday-indicator"></div>
+                </div>
+                <div class="weekday-card" data-day="Sabato">
+                    <div class="weekday-header">Sabato</div>
+                    <div class="weekday-indicator"></div>
+                </div>
+                <div class="weekday-card" data-day="Domenica">
+                    <div class="weekday-header">Domenica</div>
+                    <div class="weekday-indicator"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="time-slots-section">
+            <div class="section-title" id="selected-date-title">Seleziona un giorno della settimana</div>
+            <p style="margin-bottom: 15px; color: #666;">Clicca sugli slot orari per segnarli come disponibili. Verde = Disponibile, Arancione = Prenotato</p>
+            <p style="margin-bottom: 20px; color: #2196F3; font-size: 14px; font-weight: 600;">
+                💡 Puoi selezionare più giorni! Clicca su altri giorni per impostare i loro orari, poi salva tutto insieme.
+            </p>
+            
+            <div class="time-slots-grid" id="time-slots-grid">
+            </div>
+        </div>
+
+        <button class="save-btn">Salva Disponibilità</button>
+
+    </div>
+
+    <div id="subscriptionPopup" class="subscription-popup">
+        <div class="popup-content" style="position: relative;">
+            <span class="close-popup" onclick="document.getElementById('subscriptionPopup').classList.remove('active')">×</span>
+            <div class="popup-title">Choose Your Plan</div>
+            <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                Unlock premium features and grow your mentoring business
+            </p>
+
+            <div class="subscription-plans">
+                <div class="plan-card">
+                    <div class="plan-name">Basic</div>
+                    <div class="plan-price">Free</div>
+                    <div class="plan-duration">Forever</div>
+                    <p style="margin-top: 15px; font-size: 12px;">
+                        • 10 sessions/month<br>
+                        • Basic calendar<br>
+                        • Standard support
+                    </p>
+                </div>
+
+                <div class="plan-card selected">
+                    <div class="plan-name">Pro</div>
+                    <div class="plan-price">€29</div>
+                    <div class="plan-duration">per month</div>
+                    <p style="margin-top: 15px; font-size: 12px;">
+                        • Unlimited sessions<br>
+                        • Advanced analytics<br>
+                        • Priority support<br>
+                        • Custom branding
+                    </p>
+                </div>
+
+                <div class="plan-card">
+                    <div class="plan-name">Enterprise</div>
+                    <div class="plan-price">€99</div>
+                    <div class="plan-duration">per month</div>
+                    <p style="margin-top: 15px; font-size: 12px;">
+                        • Everything in Pro<br>
+                        • Team management<br>
+                        • API access<br>
+                        • Dedicated manager
+                    </p>
+                </div>
+            </div>
+
+            <button class="save-btn" onclick="alert('Subscription activated!')">
+                Subscribe Now
+            </button>
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/avMentor.js"></script>
+</body>
+</html>
