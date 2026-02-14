@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const mentorId = urlParams.get('mentorId');
 
     if (!mentorId) {
-        container.innerHTML = '<p style="text-align: center; color: red;">ID mentor mancante</p>';
+        container.innerHTML = '<p style="text-align: center; color: red;">Missing mentor ID</p>';
         return;
     }
 
@@ -37,13 +37,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const response = await fetch(`/api/mentee/mentor/${mentorId}`);
         
         if (!response.ok) {
-            throw new Error(`Errore ${response.status}: ${response.statusText}`);
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
         }
 
         const result = await response.json();
         
         if (!result.success) {
-            throw new Error(result.message || 'Errore nel caricamento del mentor');
+            throw new Error(result.message || 'Error loading mentor profile');
         }
 
         mentorData = result.data;
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Errore:', error);
-        container.innerHTML = `<p style="text-align: center; color: red;">Errore: ${error.message}</p>`;
+        container.innerHTML = `<p style="text-align: center; color: red;">Error: ${error.message}</p>`;
     }
 });
 
@@ -120,7 +120,7 @@ function renderBookingForm(mentor) {
         <div class="form-section">
             <div class="form-title">Select Time</div>
             <div id="timeSlots" class="time-slots">
-                <p style="color: #666; text-align: center;">Seleziona prima una data</p>
+                <p style="color: #666; text-align: center;">Select a date first</p>
             </div>
         </div>
 
@@ -167,6 +167,33 @@ function generateAvailableDays(count) {
     return days;
 }
 
+function addMinutesToTime(timeValue, minutesToAdd) {
+    const [hours, minutes] = timeValue.split(':').map(Number);
+    const totalMinutes = (hours * 60) + minutes + minutesToAdd;
+    const nextHours = Math.floor(totalMinutes / 60) % 24;
+    const nextMinutes = totalMinutes % 60;
+    return `${String(nextHours).padStart(2, '0')}:${String(nextMinutes).padStart(2, '0')}`;
+}
+
+function parseTimeToMinutes(timeValue) {
+    const [hours, minutes] = timeValue.split(':').map(Number);
+    return (hours * 60) + minutes;
+}
+
+function getDurationMinutes(startTime, endTime) {
+    const start = parseTimeToMinutes(startTime);
+    const end = parseTimeToMinutes(endTime);
+    return Math.max(end - start, 0);
+}
+
+function calculateSessionPrice(hourlyRate, durationMinutes) {
+    const safeRate = Number(hourlyRate || 0);
+    const safeDuration = Number(durationMinutes || 0);
+    if (!Number.isFinite(safeRate) || safeRate <= 0) return 0;
+    if (!Number.isFinite(safeDuration) || safeDuration <= 0) return 0;
+    return Number(((safeRate * safeDuration) / 60).toFixed(2));
+}
+
 function setupEventListeners() {
     // Event listener per i giorni del calendario
     document.querySelectorAll('.calendar-day').forEach(day => {
@@ -174,7 +201,7 @@ function setupEventListeners() {
             // Controlla se il giorno è disponibile
             const isAvailable = this.dataset.available === 'true';
             if (!isAvailable) {
-                alert('Il mentor non ha disponibilità per questo giorno');
+                alert('This mentor is not available on this day');
                 return;
             }
             
@@ -246,7 +273,7 @@ function loadTimeSlots(date) {
             });
         });
     } else {
-        timeSlotsContainer.innerHTML = '<p style="color: #666; text-align: center;">Nessuno slot disponibile per il giorno selezionato</p>';
+        timeSlotsContainer.innerHTML = '<p style="color: #666; text-align: center;">No available slots for the selected day</p>';
     }
 }
 
@@ -257,14 +284,16 @@ function updateSubmitButton() {
 
 async function submitBooking() {
     if (!selectedDate || !selectedTime) {
-        alert('Seleziona data e orario');
+        alert('Select a date and time');
         return;
     }
     
+    const endTime = addMinutesToTime(selectedTime, 60);
     const bookingData = {
         id_mentor: mentorData.Id_Utente,
         giorno: selectedDate,
-        ora: selectedTime
+        ora_inizio: selectedTime,
+        ora_fine: endTime
     };
     
     console.log('Invio prenotazione:', bookingData);
@@ -282,36 +311,37 @@ async function submitBooking() {
         const result = await response.json();
         
         if (result.success) {
-            alert('Prenotazione confermata!');
             const booking = result.data;
-            const price = parseFloat(mentorData.Prezzo) || 0;
+            const hourlyRate = parseFloat(mentorData.Prezzo) || 0;
+            const durationMinutes = getDurationMinutes(selectedTime, endTime);
+            const sessionPrice = calculateSessionPrice(hourlyRate, durationMinutes);
 
-            if (price > 0) {
+            if (sessionPrice > 0) {
                 const pendingPayment = {
                     prenotazioneId: booking.Id,
                     mentorId: mentorData.Id_Utente,
                     mentorNome: mentorData.Nome,
                     mentorCognome: mentorData.Cognome,
                     data: selectedDate,
-                    ora: selectedTime,
-                    durataMinuti: 60,
-                    prezzo: price,
-                    platformFee: 5,
-                    tax: Number((price * 0.22).toFixed(2))
+                    oraInizio: selectedTime,
+                    oraFine: endTime,
+                    durataMinuti: durationMinutes,
+                    tariffaOraria: Number(hourlyRate.toFixed(2)),
+                    prezzo: sessionPrice
                 };
                 sessionStorage.setItem('pendingPayment', JSON.stringify(pendingPayment));
                 window.location.href = '/pages/payment.html';
             } else {
                 // Nessun pagamento richiesto, torna alla dashboard
-                alert('Nessun pagamento richiesto per questa sessione.');
+                alert('No payment required for this session.');
                 window.location.href = '/pages/dashboardMentee.html';
             }
         } else {
-            alert('Errore: ' + result.message);
+            alert('Error: ' + result.message);
         }
         
     } catch (error) {
         console.error('Errore nella prenotazione:', error);
-        alert('Errore nella prenotazione: ' + error.message);
+        alert('Booking error: ' + error.message);
     }
 }

@@ -1,6 +1,7 @@
 import transporter from '../config/email.js';
 
 class EmailService {
+  
   // Invia email generica
   static async SpedMail(destinatario, oggetto, contenutoHtml, contenutoTesto = '') {
     try {
@@ -23,7 +24,9 @@ class EmailService {
 
   // Email di benvenuto
   static async inviaEmailBenvenuto(destinatario, nome, ruolo) {
-    const oggetto = 'Benvenuto su MentorMatch!';
+    const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000';
+    const dashboardUrl = `${baseUrl}/pages/login.html`;
+    const oggetto = 'Welcome to MentorMatch!';
     const html = `
       <!DOCTYPE html>
       <html>
@@ -31,36 +34,36 @@ class EmailService {
         <style>
           body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background-color: #4F46E5; color: white; padding: 20px; text-align: center; }
+          .header { background-color: #84a59d; color: white; padding: 20px; text-align: center; }
           .content { padding: 20px; background-color: #f9fafb; }
-          .button { background-color: #4F46E5; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px; }
+          .button { background-color: #84a59d; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block; margin-top: 15px; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>🎉 Benvenuto su MentorMatch!</h1>
+            <h1>🎉 Welcome to MentorMatch!</h1>
           </div>
           <div class="content">
-            <h2>Ciao ${nome},</h2>
-            <p>Siamo felici di averti con noi come <strong>${ruolo}</strong>!</p>
-            <p>MentorMatch è la piattaforma che connette professionisti esperti con giovani talenti in cerca di orientamento.</p>
+            <h2>Hi ${nome},</h2>
+            <p>We're happy to have you with us as a <strong>${ruolo}</strong>!</p>
+            <p>MentorMatch connects experienced professionals with emerging talent looking for guidance.</p>
             ${ruolo === 'Mentor' ? `
-              <p><strong>Come Mentor puoi:</strong></p>
+              <p><strong>As a Mentor you can:</strong></p>
               <ul>
-                <li>Gestire la tua disponibilità</li>
-                <li>Ricevere prenotazioni dai mentee</li>
-                <li>Condividere la tua esperienza</li>
+                <li>Manage your availability</li>
+                <li>Receive bookings from mentees</li>
+                <li>Share your experience</li>
               </ul>
             ` : `
-              <p><strong>Come Mentee puoi:</strong></p>
+              <p><strong>As a Mentee you can:</strong></p>
               <ul>
-                <li>Cercare mentor nel tuo settore</li>
-                <li>Prenotare sessioni di mentoring</li>
-                <li>Crescere professionalmente</li>
+                <li>Find mentors in your field</li>
+                <li>Book mentoring sessions</li>
+                <li>Grow professionally</li>
               </ul>
             `}
-            <a href="#" class="button">Vai alla Dashboard</a>
+            <a href="${dashboardUrl}" class="button">Go to Dashboard</a>
           </div>
         </div>
       </body>
@@ -72,20 +75,20 @@ class EmailService {
 
   // Email notifica nuova prenotazione
   static async inviaEmailNuovaPrenotazione(destinatario, nomeMentor, nomeMentee, data, ora) {
-    const oggetto = 'Nuova Prenotazione Ricevuta';
+    const oggetto = 'New Booking Request';
     const html = `
       <!DOCTYPE html>
       <html>
       <body style="font-family: Arial, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2>📅 Nuova Prenotazione</h2>
-          <p>Ciao ${nomeMentor},</p>
-          <p>Hai ricevuto una nuova richiesta di prenotazione da <strong>${nomeMentee}</strong>.</p>
+          <h2>📅 New Booking</h2>
+          <p>Hi ${nomeMentor},</p>
+          <p>You received a new booking request from <strong>${nomeMentee}</strong>.</p>
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 15px 0;">
-            <p><strong>Data:</strong> ${data}</p>
-            <p><strong>Ora:</strong> ${ora}</p>
+            <p><strong>Date:</strong> ${data}</p>
+            <p><strong>Time:</strong> ${ora}</p>
           </div>
-          <p>Accedi alla tua dashboard per confermare o gestire l'appuntamento.</p>
+          <p>Go to your dashboard to confirm or manage the appointment.</p>
         </div>
       </body>
       </html>
@@ -96,21 +99,21 @@ class EmailService {
 
   // Email conferma prenotazione
   static async inviaEmailConfermaPrenotazione(destinatario, nomeMentee, nomeMentor, data, ora, link) {
-    const oggetto = 'Prenotazione Confermata';
+    const oggetto = 'Booking Confirmed';
     const html = `
       <!DOCTYPE html>
       <html>
       <body style="font-family: Arial, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2>✅ Prenotazione Confermata</h2>
-          <p>Ciao ${nomeMentee},</p>
-          <p>La tua prenotazione con <strong>${nomeMentor}</strong> è stata confermata!</p>
+          <h2>✅ Booking Confirmed</h2>
+          <p>Hi ${nomeMentee},</p>
+          <p>Your booking with <strong>${nomeMentor}</strong> has been confirmed!</p>
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 15px 0;">
-            <p><strong>Data:</strong> ${data}</p>
-            <p><strong>Ora:</strong> ${ora}</p>
-            ${link ? `<p><strong>Link Meeting:</strong> <a href="${link}">${link}</a></p>` : ''}
+            <p><strong>Date:</strong> ${data}</p>
+            <p><strong>Time:</strong> ${ora}</p>
+            ${link ? `<p><strong>Meeting Link:</strong> <a href="${link}">${link}</a></p>` : ''}
           </div>
-          <p>Ti aspettiamo!</p>
+          <p>See you there!</p>
         </div>
       </body>
       </html>
@@ -121,17 +124,17 @@ class EmailService {
 
   // Email annullamento prenotazione
   static async inviaEmailAnnullamento(destinatario, nome, motivazione = '') {
-    const oggetto = 'Prenotazione Annullata';
+    const oggetto = 'Booking Canceled';
     const html = `
       <!DOCTYPE html>
       <html>
       <body style="font-family: Arial, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2>❌ Prenotazione Annullata</h2>
-          <p>Ciao ${nome},</p>
-          <p>La tua prenotazione è stata annullata.</p>
-          ${motivazione ? `<p><strong>Motivazione:</strong> ${motivazione}</p>` : ''}
-          <p>Puoi effettuare una nuova prenotazione quando preferisci.</p>
+          <h2>❌ Booking Canceled</h2>
+          <p>Hi ${nome},</p>
+          <p>Your booking was canceled.</p>
+          ${motivazione ? `<p><strong>Reason:</strong> ${motivazione}</p>` : ''}
+          <p>You can book a new session whenever you like.</p>
         </div>
       </body>
       </html>
@@ -142,21 +145,46 @@ class EmailService {
 
   // Email nuova recensione
   static async inviaEmailNuovaRecensione(destinatario, nomeMentor, nomeMentee, voto) {
-    const oggetto = 'Nuova Recensione Ricevuta';
+    const oggetto = 'New Review Received';
     const stelle = '⭐'.repeat(voto);
     const html = `
       <!DOCTYPE html>
       <html>
       <body style="font-family: Arial, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h2>⭐ Nuova Recensione</h2>
-          <p>Ciao ${nomeMentor},</p>
-          <p>Hai ricevuto una nuova recensione da <strong>${nomeMentee}</strong>!</p>
+          <h2>⭐ New Review</h2>
+          <p>Hi ${nomeMentor},</p>
+          <p>You received a new review from <strong>${nomeMentee}</strong>!</p>
           <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 15px 0;">
             <p style="font-size: 24px;">${stelle}</p>
-            <p><strong>Voto:</strong> ${voto}/5</p>
+            <p><strong>Rating:</strong> ${voto}/5</p>
           </div>
-          <p>Accedi alla dashboard per visualizzare il commento completo.</p>
+          <p>Go to your dashboard to view the full comment.</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return await this.SpedMail(destinatario, oggetto, html);
+  }
+
+  // Email conferma cambio email
+  static async inviaEmailCambioMail(destinatario, nome, newEmail, confirmUrl) {
+    const oggetto = 'Confirm your new email address';
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <body style="font-family: Arial, sans-serif;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2>✅ Confirm your email</h2>
+          <p>Hi ${nome},</p>
+          <p>We received a request to update your email address on MentorMatch.</p>
+          <p><strong>New email:</strong> ${newEmail}</p>
+          <p>Please confirm the change by clicking the button below:</p>
+          <p style="margin-top: 20px;">
+            <a href="${confirmUrl}" style="background-color: #4F46E5; color: #fff; padding: 12px 20px; text-decoration: none; border-radius: 6px; display: inline-block;">Confirm Email</a>
+          </p>
+          <p>If you did not request this change, you can ignore this email.</p>
         </div>
       </body>
       </html>

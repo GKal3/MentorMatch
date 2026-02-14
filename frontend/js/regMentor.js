@@ -1,7 +1,15 @@
 // Script per la registrazione di un nuovo mentor
+const PLATFORM_FEE_PERCENT = 15;
+
 document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('submitBtn');
+    const priceInput = document.getElementById('price');
     loadOptions();
+
+    if (priceInput) {
+        priceInput.addEventListener('input', updatePayoutRequirements);
+    }
+    updatePayoutRequirements();
     
     if (submitBtn) {
         submitBtn.addEventListener('click', handleSubmit);
@@ -32,7 +40,7 @@ async function loadOptions() {
     try {
         const resp = await fetch('/api/mentor/options');
         if (!resp.ok) {
-            throw new Error('Impossibile caricare le opzioni');
+            throw new Error('Unable to load options');
         }
         const data = await resp.json();
         setOptions(sectorSelect, data.settori || [], 'Select area');
@@ -60,6 +68,8 @@ async function handleSubmit(e) {
         organizzazione: document.getElementById('company').value.trim(),
         esperienza: document.getElementById('experience').value,
         prezzo: priceInput === '' ? undefined : parseFloat(priceInput),
+        iban: document.getElementById('iban').value.trim().replace(/\s+/g, '').toUpperCase(),
+        accetta_commissione_piattaforma: document.getElementById('platformFeeAck').checked,
         settore: document.getElementById('expertise').value,
         lingua: document.getElementById('language').value,
         bio: document.getElementById('bio').value.trim()
@@ -67,38 +77,53 @@ async function handleSubmit(e) {
 
     // Validazione base
     if (!payload.nome || !payload.cognome || !payload.mail || !payload.password) {
-        alert('Compila tutti i campi obbligatori (nome, cognome, email, password)');
+        alert('Please fill in all required fields (first name, last name, email, password)');
         return;
     }
 
     if (payload.password.length < 8) {
-        alert('La password deve essere di almeno 8 caratteri');
+        alert('Password must be at least 8 characters');
         return;
     }
 
     if (!payload.data_nascita || !payload.genere) {
-        alert('Compila data di nascita e genere');
+        alert('Please provide date of birth and gender');
         return;
     }
 
     if (!payload.titolo || !payload.esperienza) {
-        alert('Inserisci titolo professionale ed esperienza');
+        alert('Please enter your professional title and experience');
         return;
     }
 
     if (!payload.organizzazione) {
-        alert('Inserisci azienda/organizzazione');
+        alert('Please enter your company/organization');
         return;
     }
 
     if (!payload.settore || !payload.lingua || !payload.bio) {
-        alert('Compila tutti i campi relativi al mentoring (settore, lingua, bio)');
+        alert('Please fill in all mentoring fields (expertise, language, bio)');
         return;
     }
 
     if (priceInput !== '' && !Number.isFinite(payload.prezzo)) {
-        alert('Il prezzo deve essere un numero valido');
+        alert('Price must be a valid number');
         return;
+    }
+
+    if (Number(payload.prezzo || 0) > 0) {
+        if (!payload.iban) {
+            alert('IBAN is required when your session price is greater than €0.');
+            return;
+        }
+        if (!/^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/.test(payload.iban)) {
+            alert('Please provide a valid IBAN.');
+            return;
+        }
+        if (!payload.accetta_commissione_piattaforma) {
+            alert(`You must accept the platform fee (${PLATFORM_FEE_PERCENT}%) for paid sessions.`);
+            return;
+        }
     }
 
     const formData = new FormData();
@@ -111,7 +136,7 @@ async function handleSubmit(e) {
     if (cvInput && cvInput.files && cvInput.files.length > 0) {
         formData.append('cv_file', cvInput.files[0]);
     } else {
-        alert('Carica il tuo CV (PDF/DOC)');
+        alert('Please upload your resume (PDF/DOC)');
         return;
     }
 
@@ -127,14 +152,39 @@ async function handleSubmit(e) {
             localStorage.setItem('token', result.token);
             localStorage.setItem('user', JSON.stringify(result.user));
 
-            alert('Registrazione completata con successo! Benvenuto/a ' + payload.nome + '!\n\nOra imposta la tua disponibilità settimanale.');
+            alert('Registration completed successfully! Welcome ' + payload.nome + '!\n\nNow set your weekly availability.');
             window.location.href = '/pages/avMentor.html';
         } else {
-            alert('Errore: ' + result.message);
+            alert('Error: ' + result.message);
         }
 
     } catch (error) {
-        console.error('Errore nella registrazione:', error);
-        alert('Errore nella registrazione: ' + error.message);
+        console.error('Registration error:', error);
+        alert('Registration error: ' + error.message);
     }
+}
+
+function updatePayoutRequirements() {
+    const priceInput = document.getElementById('price');
+    const ibanInput = document.getElementById('iban');
+    const feeAck = document.getElementById('platformFeeAck');
+    const feeHint = document.getElementById('platformFeeHint');
+    if (!priceInput || !ibanInput || !feeAck || !feeHint) return;
+
+    const price = Number(priceInput.value || 0);
+    const isPaidSession = Number.isFinite(price) && price > 0;
+
+    ibanInput.required = isPaidSession;
+    feeAck.required = isPaidSession;
+    feeAck.disabled = !isPaidSession;
+
+    if (!isPaidSession) {
+        feeAck.checked = false;
+    }
+
+    const keepAmount = isPaidSession ? (price * (PLATFORM_FEE_PERCENT / 100)) : 0;
+    const mentorNet = isPaidSession ? (price - keepAmount) : 0;
+    feeHint.textContent = isPaidSession
+        ? `Platform fee: ${PLATFORM_FEE_PERCENT}% (€${keepAmount.toFixed(2)}). Mentor receives €${mentorNet.toFixed(2)}.`
+        : `Set a price > 0 to enable payouts. Platform fee is ${PLATFORM_FEE_PERCENT}%.`;
 }

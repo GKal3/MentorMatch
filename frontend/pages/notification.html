@@ -10,19 +10,24 @@
     <header>
         <img class="logo" alt="Logo" src="../assets/Logo.svg" />
         <nav>
-            <a href="dashboardMentee.html">DASHBOARD</a>
-            <a href="chat.html">MESSAGES</a>
+            <a href="index.html">HOME</a>
+            <a href="/pages/notification.html">NOTIFICATIONS</a>
             <a href="#">LOGOUT</a>
         </nav>
     </header>
 
-    <div class="notifications-container">
-        <div class="notifications-header">
-            <div>
-                <div class="header-title">Notifications</div>
-                <div class="header-subtitle">You have <span id="unread-count">0</span> unread notifications</div>
+    <div class="sidebar" id="role-sidebar"></div>
+
+    <div class="notifications-container notifications-with-sidebar">
+        <div class="welcome-section notifications-title-section">
+            <div class="notifications-title-copy">
+                <h1>Notifications</h1>
+                <p style="color: #666;">You have <span id="unread-count">0</span> unread notifications</p>
             </div>
-            <button class="mark-all-btn">Mark all as read</button>
+
+            <div class="notifications-topbar">
+                <button class="mark-all-btn">Mark all as read</button>
+            </div>
         </div>
 
         <div class="filter-buttons">
@@ -30,10 +35,10 @@
             <button class="filter-btn">Sessions</button>
             <button class="filter-btn">Messages</button>
             <button class="filter-btn">Payments</button>
-            <button class="filter-btn">Reviews</button>
         </div>
 
         <div class="notifications-section">
+            
             <div id="notifications-list" class="notifications-list"></div>
             <div id="empty-state" class="empty-state" style="display:none;">
                 <div class="empty-state-icon">🔔</div>

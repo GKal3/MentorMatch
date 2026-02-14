@@ -61,6 +61,17 @@ class User {
     return result.rows[0];
   }
 
+  static async updateEmail(id, mail) {
+    const result = await pool.query(
+      `UPDATE "Utenti"
+       SET "Mail" = $1
+       WHERE "Id" = $2
+       RETURNING *`,
+      [mail, id]
+    );
+    return result.rows[0];
+  }
+
   static async delete(id) {
     await pool.query(
       'DELETE FROM "Utenti" WHERE "Id" = $1',

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Become a Mentor - MentorMatch</title>
     <link rel="stylesheet" href="../css/style.css" />
+    <script src="../js/utils.js"></script>
     <script src="../js/regMentor.js"></script>
 </head>
 <body>
@@ -13,7 +14,7 @@
         <nav>
             <a href="index.html">HOME</a>
             <a href="/pages/search.html">SEARCH FOR MENTORS</a>
-            <a href="/pages/regMentor.html">WORK WITH US</a>
+            <a href="/pages/login.html" class="btn btn-primary" style="padding: 10px 24px; font-size: 14px;">LOGIN</a>
         </nav>
     </header>
 
@@ -39,10 +40,6 @@
             <div class="form-group">
                 <label class="form-label">Email *</label>
                 <input type="email" id="email" class="form-input" placeholder="your.email@example.com" required />
-            </div>
-            <div class="form-group">
-                <label class="form-label">Phone Number</label>
-                <input type="tel" id="phone" class="form-input" placeholder="+39 123 456 7890" />
             </div>
             <div class="form-row">
                 <div class="form-group">
@@ -109,12 +106,21 @@
                 <label class="form-label">Session Price (per hour) *</label>
                 <input type="number" id="price" class="form-input" placeholder="50" min="0" required />
             </div>
+            <div class="form-group">
+                <label class="form-label">IBAN (required only for paid sessions)</label>
+                <input type="text" id="iban" class="form-input" placeholder="IT60X0542811101000000123456" maxlength="34" />
+            </div>
+            <div class="form-group" style="display: flex; gap: 8px; align-items: flex-start;">
+                <input type="checkbox" id="platformFeeAck" />
+                <label for="platformFeeAck" style="margin: 0;">I understand that the platform keeps a percentage fee on each paid session payout.</label>
+            </div>
+            <div id="platformFeeHint" style="color: #666; font-size: 12px; margin-top: 5px;"></div>
         </div>
 
         <div class="form-section">
             <div class="form-title">Upload Documents</div>
             <div class="form-group">
-                <label class="form-label">Resume/CV (Optional)</label>
+                <label class="form-label">Resume/CV</label>
                 <input type="file" id="cvFile" name="cv_file" class="form-input" accept=".pdf,.doc,.docx" required />
                 <div style="color: #666; font-size: 12px; margin-top: 5px;">Upload a PDF or DOC/DOCX from your device</div>
             </div>

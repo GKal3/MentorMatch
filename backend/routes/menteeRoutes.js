@@ -1,6 +1,7 @@
 import express from 'express';
 import { 
   AreaPerMentee,
+  getPersonalInfo,
   ModDati,
   RicercaMentor,
   ApriProfiloMentor,
@@ -13,7 +14,10 @@ import {
   Storico,
   CancellaApp,
   getAllNot,
-  getNotification
+  getNotification,
+  getUnreadCount,
+  markAllNotificationsAsRead,
+  markNotificationAsRead
 } from '../controllers/menteeController.js';
 import { ValidaJWT, verificaRuolo } from '../middleware/auth.js';
 import { 
@@ -31,9 +35,14 @@ router.get('/search', RicercaMentor);
 // GET /api/mentee/mentor/:id - Profilo mentor (pubblica)
 router.get('/mentor/:id', ApriProfiloMentor);
 
-// Tutte le route successive richiedono autenticazione e ruolo Mentee
+// Tutte le route successive richiedono autenticazione
 router.use(ValidaJWT);
-router.use(verificaRuolo('Mentee'));
+
+// GET /api/mentee/personal/:id - Dati personali
+router.get('/personal/:id', getPersonalInfo);
+
+// PUT /api/mentee/personal/:id - Modifica dati personali
+router.put('/personal/:id', ModDati);
 
 // GET /api/mentee/area - Area riservata
 router.get('/area', AreaPerMentee);
@@ -48,7 +57,7 @@ router.get('/appointments', StatoApp);
 router.put('/appointments/:id/cancel', CancellaApp);
 
 // GET /api/mentee/payments/history - Storico pagamenti
-router.get('/payments/history', Storico);
+router.get('/payments/history', verificaRuolo('Mentee'), Storico);
 
 // PUT /api/mentee/profile - Modifica dati
 router.put('/profile', ModDati);
@@ -67,6 +76,15 @@ router.delete('/reviews/:id', CancRec);
 
 // GET /api/mentee/notifications - Tutte le notifiche
 router.get('/notifications', getAllNot);
+
+// GET /api/mentee/notifications/unread-count - Numero notifiche non lette
+router.get('/notifications/unread-count', getUnreadCount);
+
+// PUT /api/mentee/notifications/read-all - Segna tutte come lette
+router.put('/notifications/read-all', markAllNotificationsAsRead);
+
+// PUT /api/mentee/notifications/:id/read - Segna singola notifica come letta
+router.put('/notifications/:id/read', markNotificationAsRead);
 
 // GET /api/mentee/notifications/:id - Singola notifica
 router.get('/notifications/:id', getNotification);

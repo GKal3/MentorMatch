@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Edit Profile - Mentor</title>
+    <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+    <header>
+        <img class="logo" alt="Logo" src="../assets/Logo.svg" />
+        <nav>
+            <a href="index.html">HOME</a>
+            <a href="/pages/dashboardMentor.html">DASHBOARD</a>
+            <a href="#">LOGOUT</a>
+        </nav>
+    </header>
+
+    <div class="register-container">
+        <h1 style="text-align: center; margin-bottom: 20px;">Edit Mentor Profile</h1>
+
+        <div class="form-section">
+            <div class="form-title">Account Details</div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">First Name</label>
+                    <input type="text" id="firstName" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Last Name</label>
+                    <input type="text" id="lastName" class="form-input" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Email</label>
+                <input type="email" id="email" class="form-input" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Date of Birth</label>
+                    <input type="date" id="birthDate" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Gender</label>
+                    <select id="gender" class="form-select">
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Prefer not to say">Prefer not to say</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-title">Professional Information</div>
+            <div class="form-group">
+                <label class="form-label">Professional Title</label>
+                <input type="text" id="professionalTitle" class="form-input" placeholder="e.g., Senior Software Engineer" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Company/Organization</label>
+                <input type="text" id="organization" class="form-input" placeholder="e.g., Google, Freelancer" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Years of Experience</label>
+                <select id="experience" class="form-select">
+                    <option value="">Select experience level</option>
+                    <option value="1-3">1-3 years</option>
+                    <option value="3-5">3-5 years</option>
+                    <option value="5-10">5-10 years</option>
+                    <option value="10+">10+ years</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-section">
+            <div class="form-title">Mentoring Details</div>
+            <div class="form-group">
+                <label class="form-label">Main Area of Expertise</label>
+                <select id="expertise" class="form-select">
+                    <option value="">Select area</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Language</label>
+                <select id="language" class="form-select">
+                    <option value="">Select language</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">About You</label>
+                <textarea id="bio" class="form-textarea" placeholder="Tell us about your background and mentoring style"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Session Price (per hour)</label>
+                <input type="number" id="price" class="form-input" placeholder="50" min="0" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">IBAN</label>
+                <input type="text" id="iban" class="form-input" placeholder="IT60X0542811101000000123456" maxlength="34" />
+            </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button id="cancelBtn" class="submit-btn" style="background: #e6e6e6; color: #000;">Cancel</button>
+            <button id="saveBtn" class="submit-btn">Save Changes</button>
+        </div>
+    </div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/editProfileMentor.js"></script>
+</body>
+</html>

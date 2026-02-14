@@ -25,6 +25,9 @@ router.delete('/appointment/:id', mentorController.cancelAppointment);
 // Notification routes
 router.get('/notifications', mentorController.getAllNot);
 router.get('/notification/:id', mentorController.getNotification);
+router.get('/notifications/unread-count', mentorController.getUnreadCount);
+router.put('/notifications/read-all', mentorController.markAllNotificationsAsRead);
+router.put('/notifications/:id/read', mentorController.markNotificationAsRead);
 
 // Availability routes
 router.get('/availability/:id', mentorController.getAv);

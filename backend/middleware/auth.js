@@ -21,7 +21,7 @@ export const ValidaJWT = (req, res, next) => {
       console.log('ValidaJWT: No token found');
       return res.status(401).json({
         success: false,
-        message: 'Token di autenticazione mancante',
+        message: 'Authentication token missing',
       });
     }
 
@@ -40,20 +40,20 @@ export const ValidaJWT = (req, res, next) => {
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({
         success: false,
-        message: 'Token scaduto',
+        message: 'Token expired',
       });
     }
 
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({
         success: false,
-        message: 'Token non valido',
+        message: 'Invalid token',
       });
     }
 
     return res.status(500).json({
       success: false,
-      message: 'Errore nella validazione del token',
+      message: 'Error validating token',
     });
   }
 };
@@ -64,14 +64,14 @@ export const verificaRuolo = (...ruoliConsentiti) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: 'Utente non autenticato',
+        message: 'User not authenticated',
       });
     }
 
     if (!ruoliConsentiti.includes(req.user.ruolo)) {
       return res.status(403).json({
         success: false,
-        message: 'Non hai i permessi per accedere a questa risorsa',
+        message: 'You do not have permission to access this resource',
       });
     }
 

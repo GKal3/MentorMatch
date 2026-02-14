@@ -1,6 +1,100 @@
 import pool from "../config/database.js";
 
 class Appointment {
+    static async ensureMeetingLinkColumn() {
+        await pool.query('ALTER TABLE "Prenotazioni" ADD COLUMN IF NOT EXISTS "link" TEXT');
+    }
+
+    static async updateMeetingLink(appointmentId, meetingLink) {
+        const queries = [
+            `
+            UPDATE "Prenotazioni"
+            SET "Link" = $1
+            WHERE "Id" = $2
+            RETURNING *
+            `,
+            `
+            UPDATE "Prenotazioni"
+            SET "link" = $1
+            WHERE "Id" = $2
+            RETURNING *
+            `,
+        ];
+
+        let lastError = null;
+        for (const query of queries) {
+            try {
+                const result = await pool.query(query, [meetingLink, appointmentId]);
+                return result.rows[0];
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        try {
+            await this.ensureMeetingLinkColumn();
+            const result = await pool.query(
+                `
+                UPDATE "Prenotazioni"
+                SET "link" = $1
+                WHERE "Id" = $2
+                RETURNING *
+                `,
+                [meetingLink, appointmentId]
+            );
+            return result.rows[0];
+        } catch (error) {
+            lastError = error;
+        }
+
+        throw lastError || new Error('Unable to persist meeting link');
+    }
+
+    static async clearMeetingLink(appointmentId) {
+        const queries = [
+            `
+            UPDATE "Prenotazioni"
+            SET "Link" = NULL
+            WHERE "Id" = $1
+            RETURNING *
+            `,
+            `
+            UPDATE "Prenotazioni"
+            SET "link" = NULL
+            WHERE "Id" = $1
+            RETURNING *
+            `,
+        ];
+
+        let lastError = null;
+        for (const query of queries) {
+            try {
+                const result = await pool.query(query, [appointmentId]);
+                return result.rows[0];
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        try {
+            await this.ensureMeetingLinkColumn();
+            const result = await pool.query(
+                `
+                UPDATE "Prenotazioni"
+                SET "link" = NULL
+                WHERE "Id" = $1
+                RETURNING *
+                `,
+                [appointmentId]
+            );
+            return result.rows[0];
+        } catch (error) {
+            lastError = error;
+        }
+
+        throw lastError || new Error('Unable to clear meeting link');
+    }
+
     // 1. Visualizza tutti gli appuntamenti di un mentor in un giorno specifico o tutti
     static async getAllMentor(mentorUserId, giorno) {
         let query, params;
@@ -21,7 +115,7 @@ class Appointment {
             JOIN "Mentee" mentee ON p."Id_Mentee" = mentee."Id_Utente"
             JOIN "Utenti" u ON mentee."Id_Utente" = u."Id"
             WHERE p."Id_Mentor" = $1 AND p."Giorno" = $2
-            ORDER BY p."Giorno" DESC, p."Ora" DESC
+            ORDER BY p."Giorno" DESC, p."Ora_Inizio" DESC
             `;
             params = [mentorUserId, giorno];
         } else {
@@ -36,7 +130,7 @@ class Appointment {
             JOIN "Mentee" mentee ON p."Id_Mentee" = mentee."Id_Utente"
             JOIN "Utenti" u ON mentee."Id_Utente" = u."Id"
             WHERE p."Id_Mentor" = $1
-            ORDER BY p."Giorno" DESC, p."Ora" DESC
+            ORDER BY p."Giorno" DESC, p."Ora_Inizio" DESC
             `;
             params = [mentorUserId];
         }
@@ -72,7 +166,7 @@ class Appointment {
         FROM "Prenotazioni" p
         JOIN "Mentee" mentee ON p."Id_Mentee" = mentee."Id_Utente"
         JOIN "Utenti" u_mentee ON mentee."Id_Utente" = u_mentee."Id"
-        JOIN "Mentor" mentor ON p."Id_Mentor" = mentor."Id"
+        JOIN "Mentor" mentor ON p."Id_Mentor" = mentor."Id_Utente"
         JOIN "Utenti" u_mentor ON mentor."Id_Utente" = u_mentor."Id"
         WHERE p."Id" = $1
         `;
@@ -89,19 +183,26 @@ class Appointment {
     }
     
     // Metodi Mentee
-    static async create(idMentor, idMentee, giorno, ora, stato) {
+    static async create(idMentor, idMentee, giorno, oraInizio, oraFine, stato) {
         const result = await pool.query(
-            'INSERT INTO "Prenotazioni" ("Id_Mentor", "Id_Mentee", "Giorno", "Ora", "Stato") VALUES ($1, $2, $3, $4, $5) RETURNING *',
-            [idMentor, idMentee, giorno, ora, stato]
+            'INSERT INTO "Prenotazioni" ("Id_Mentor", "Id_Mentee", "Giorno", "Ora_Inizio", "Ora_Fine", "Stato") VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [idMentor, idMentee, giorno, oraInizio, oraFine, stato]
         );
         return result.rows[0];
     }
 
     // Verifica disponibilità slot
-    static async checkAvailability(idMentor, giorno, ora) {
+    static async checkAvailability(idMentor, giorno, oraInizio, oraFine) {
         const result = await pool.query(
-            'SELECT 1 FROM "Prenotazioni" WHERE "Id_Mentor" = $1 AND "Giorno" = $2 AND "Ora" = $3 AND "Stato" != \'Annullato\'',
-            [idMentor, giorno, ora]
+            `
+            SELECT 1
+            FROM "Prenotazioni"
+            WHERE "Id_Mentor" = $1
+              AND "Giorno" = $2
+              AND "Stato" IN ('Pending', 'Accepted')
+              AND NOT ("Ora_Fine" <= $3 OR "Ora_Inizio" >= $4)
+            `,
+            [idMentor, giorno, oraInizio, oraFine]
         );
         return result.rows.length === 0;
     }
@@ -109,7 +210,7 @@ class Appointment {
     // Verifica se mentee ha completato una sessione con mentor
     static async hasCompletedSession(idMentee, idMentor) {
         const result = await pool.query(
-            'SELECT 1 FROM "Prenotazioni" WHERE "Id_Mentee" = $1 AND "Id_Mentor" = $2 AND "Stato" = \'Accettato\'',
+            'SELECT 1 FROM "Prenotazioni" WHERE "Id_Mentee" = $1 AND "Id_Mentor" = $2 AND "Stato" = \'Accepted\'',
             [idMentee, idMentor]
         );
         return result.rows.length > 0;
@@ -129,7 +230,7 @@ class Appointment {
         JOIN "Utenti" u ON p."Id_Mentor" = u."Id"
         JOIN "Mentor" m ON u."Id" = m."Id_Utente"
         WHERE p."Id_Mentee" = $1
-        ORDER BY p."Giorno" DESC, p."Ora" DESC
+        ORDER BY p."Giorno" DESC, p."Ora_Inizio" DESC
         `;
 
         const result = await pool.query(query, [menteeId]);
@@ -140,8 +241,8 @@ class Appointment {
     static async cancelAppointment(appointmentId, userId) {
         const query = `
         UPDATE "Prenotazioni" 
-        SET "Stato" = 'Annullato' 
-        WHERE "Id" = $1 AND "Id_Mentee" = $2 AND "Stato" != 'Annullato'
+        SET "Stato" = 'Cancelled' 
+        WHERE "Id" = $1 AND "Id_Mentee" = $2 AND "Stato" != 'Cancelled'
         RETURNING *
         `;
         const result = await pool.query(query, [appointmentId, userId]);

@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!requireAuth()) return;
     
     currentUser = getCurrentUser();
+
+    renderRoleSidebar();
     
     // Imposta il link della dashboard in base al ruolo
     updateDashboardLink();
@@ -37,6 +39,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+function renderRoleSidebar() {
+    const sidebar = document.getElementById('role-sidebar');
+    if (!sidebar || !currentUser) return;
+
+    const role = (currentUser.ruolo || currentUser.role || '').toLowerCase();
+
+    if (role === 'mentor') {
+        sidebar.innerHTML = `
+            <a href="dashboardMentor.html">Dashboard</a>
+            <a href="avMentor.html">Availability</a>
+            <a href="#" class="active">Messages</a>
+            <a href="appointmentsMentor.html">Appointments</a>
+            <a href="reviewsMentor.html">Reviews</a>
+            <a href="earnings.html">Earnings</a>
+        `;
+        return;
+    }
+
+    if (role === 'mentee') {
+        sidebar.innerHTML = `
+            <a href="dashboardMentee.html">Dashboard</a>
+            <a href="appArea.html">My Sessions</a>
+            <a href="#" class="active">Messages</a>
+            <a href="search.html">Find Mentors</a>
+            <a href="paymentHistory.html">Payment History</a>
+        `;
+        return;
+    }
+
+    sidebar.style.display = 'none';
+}
 
 function updateDashboardLink() {
     const dashboardLink = document.getElementById('dashboard-link');
@@ -78,7 +112,7 @@ async function loadAllChats() {
         });
         
         if (!response.ok) {
-            throw new Error('Errore nel caricamento delle chat');
+            throw new Error('Error loading chats');
         }
         
         const chats = await response.json();
@@ -86,7 +120,7 @@ async function loadAllChats() {
         renderConversations(chats);
         
     } catch (error) {
-        console.error('Errore nel caricamento delle chat:', error);
+        console.error('Error loading chats:', error);
         document.getElementById('conversations-container').innerHTML = 
             '<p style="padding: 20px; color: #666; text-align: center;">No conversations yet</p>';
     }
@@ -173,7 +207,7 @@ async function loadConversation(userId1, userId2) {
         });
         
         if (!response.ok) {
-            throw new Error('Errore nel caricamento della conversazione');
+            throw new Error('Error loading conversation');
         }
         
         const messages = await response.json();
@@ -181,7 +215,7 @@ async function loadConversation(userId1, userId2) {
         renderMessages(messages);
         
     } catch (error) {
-        console.error('Errore nel caricamento della conversazione:', error);
+        console.error('Error loading conversation:', error);
         document.getElementById('messages-area').innerHTML = 
             '<p style="text-align: center; color: #666; margin-top: 100px;">Error loading messages</p>';
     }
@@ -252,7 +286,7 @@ async function sendMessage() {
         });
         
         if (!response.ok) {
-            throw new Error('Errore nell\'invio del messaggio');
+            throw new Error('Error sending message');
         }
         
         // Svuota input
@@ -262,7 +296,7 @@ async function sendMessage() {
         await loadConversation(currentUser.id, currentConversationUserId);
         
     } catch (error) {
-        console.error('Errore nell\'invio del messaggio:', error);
-        alert('Errore nell\'invio del messaggio');
+        console.error('Error sending message:', error);
+        alert('Error sending message');
     }
 }

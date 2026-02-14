@@ -10,16 +10,27 @@
     <header>
         <img class="logo" alt="Logo" src="../assets/Logo.svg" />
         <nav>
-            <a href="dashboardMentee.html">DASHBOARD</a>
-            <a href="chat.html">MESSAGES</a>
+            <a href="index.html">HOME</a>
+            <a href="notification.html">NOTIFICATIONS</a>
             <a href="#">LOGOUT</a>
         </nav>
     </header>
 
-    <div class="appointments-container">
-        <h1 style="text-align: center; margin-bottom: 30px;">My Sessions</h1>
+    <div class="sidebar">
+        <a href="dashboardMentee.html">Dashboard</a>
+        <a href="#" class="active">My Sessions</a>
+        <a href="chat.html">Messages</a>
+        <a href="search.html">Find Mentors</a>
+        <a href="paymentHistory.html">Payment History</a>
+    </div>
 
-        <div class="tabs-navigation">
+    <div class="appointments-container" style="margin-left: 220px; max-width: calc(100% - 260px);">
+        <div class="welcome-section">
+            <h1>My Sessions</h1>
+            <p style="color: #666;">Manage your upcoming, past and cancelled sessions</p>
+        </div>
+
+        <div class="tabs-navigation" style="margin-bottom: 15px;">
             <button class="tab-btn active" data-target="upcomingSection">Upcoming</button>
             <button class="tab-btn" data-target="pastSection">Past Sessions</button>
             <button class="tab-btn" data-target="cancelledSection">Cancelled</button>

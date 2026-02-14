@@ -23,36 +23,70 @@
         <a href="appointmentsMentor.html">Appointments</a>
         <a href="reviewsMentor.html">Reviews</a>
         <a href="earnings.html">Earnings</a>
-        <a href="#">My Profile</a>
     </div>
 
-    <div class="dashboard-container" style="margin-left: 220px;">
-        <div class="welcome-section">
-            <div>
-                <h1 id="greeting" style="margin-bottom: 5px;">Welcome, Mentor!</h1>
-                <p style="color: #666;">Here's what's happening with your mentoring today</p>
+    <div class="dashboard-container dashboard-wide">
+        <div class="welcome-section dashboard-hero">
+            <!-- Sezione superiore: Avatar + Welcome a sinistra, Dati a destra -->
+            <div class="dashboard-top-row">
+                <!-- Colonna sinistra: Avatar + Welcome -->
+                <div class="dashboard-left-col">
+                    <div class="profile-avatar"></div>
+                    <div class="dashboard-left-copy">
+                        <h1 id="greeting" class="dashboard-greeting">Welcome, Mentor!</h1>
+                        <p class="dashboard-subtitle">Here's what's happening with your mentoring today</p>
+                        
+                        <div class="stat-card dashboard-rate-card">
+                            <div class="stat-value" id="price">€0/h</div>
+                            <div class="stat-label">Hourly Rate</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Colonna destra: Dati personali -->
+                <div class="stat-card dashboard-profile-card dashboard-profile-card--mentor" id="profileInfo">
+                    <div class="dashboard-profile-grid">
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Full Name</div>
+                            <div id="profile-name" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Email</div>
+                            <div id="profile-email" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Date of Birth</div>
+                            <div id="profile-dob" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Expertise Area</div>
+                            <div id="profile-sector" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Language</div>
+                            <div id="profile-language" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Professional Title</div>
+                            <div id="profile-title" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Years of Experience</div>
+                            <div id="profile-experience" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Organization</div>
+                            <div id="profile-organization" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Bio</div>
+                            <div id="profile-bio" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="price">€0/h</div>
-                <div class="stat-label">Hourly Rate</div>
+                <button id="editProfileBtn" class="submit-btn dashboard-edit-btn">Edit Profile</button>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="rating">0 ⭐</div>
-                <div class="stat-label">Average Rating</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="reviews">0</div>
-                <div class="stat-label">Total Reviews</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="upcoming">0</div>
-                <div class="stat-label">Upcoming Sessions</div>
-            </div>
-        </div>
-
         <div class="section">
             <div class="section-title">Upcoming Sessions</div>
             <p id="no-appointments" style="color: #666;">No upcoming appointments</p>

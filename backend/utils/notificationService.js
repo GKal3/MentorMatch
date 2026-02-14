@@ -2,16 +2,21 @@ import Notification from '../models/Notification.js';
 import EmailService from './emailService.js';
 
 class NotificationService {
+    static emailAggregationWindowMs = Number.isFinite(Number(process.env.NOTIFICATION_EMAIL_WINDOW_MS))
+        ? Number(process.env.NOTIFICATION_EMAIL_WINDOW_MS)
+        : 45000;
+
+    static pendingEmailBatches = new Map();
+
     /**
-     * Crea notifica nel DB e opzionalmente invia email
+     * Crea notifica nel DB e invia email
      * @param {number} userId - ID utente destinatario
      * @param {string} tipo - Tipo notifica ('prenotazione', 'cancellazione', 'messaggio', 'recensione')
      * @param {string} titolo - Titolo notifica
      * @param {string} messaggio - Testo notifica
      * @param {object} data - Dati aggiuntivi (es. appointmentId, link)
-     * @param {boolean} sendEmailToo - Se inviare anche email
      */
-    static async create(userId, tipo, titolo, messaggio, data = {}, sendEmailToo = true) {
+    static async create(userId, tipo, titolo, messaggio, data = {}) {
         try {
         // 1. Crea notifica nel database
         const notification = await Notification.create(
@@ -22,17 +27,8 @@ class NotificationService {
             data
         );
         
-        // 2. Invia email se richiesto
-        if (sendEmailToo) {
-            const user = await this.getUserEmail(userId);
-            if (user?.email) {
-            await EmailService.SpedMail(
-                user.email,
-                titolo,
-                messaggio
-            );
-            }
-        }
+        // 2. Accoda email (aggregata per burst)
+        await this.enqueueNotificationEmail(userId, titolo, messaggio);
         
         // 3. Invia push notification
         if (notification) {
@@ -42,8 +38,55 @@ class NotificationService {
         return notification;
         
         } catch (error) {
-        console.error('Errore creazione notifica:', error);
+        console.error('Notification creation error:', error);
         throw error;
+        }
+    }
+
+    static async enqueueNotificationEmail(userId, titolo, messaggio) {
+        const existing = this.pendingEmailBatches.get(userId);
+
+        if (existing) {
+            existing.count += 1;
+            existing.lastTitle = titolo;
+            existing.lastMessage = messaggio;
+            return;
+        }
+
+        const batch = {
+            count: 1,
+            firstTitle: titolo,
+            firstMessage: messaggio,
+            lastTitle: titolo,
+            lastMessage: messaggio,
+            timer: setTimeout(async () => {
+                await this.flushNotificationEmail(userId);
+            }, this.emailAggregationWindowMs),
+        };
+
+        this.pendingEmailBatches.set(userId, batch);
+    }
+
+    static async flushNotificationEmail(userId) {
+        const batch = this.pendingEmailBatches.get(userId);
+        if (!batch) return;
+
+        this.pendingEmailBatches.delete(userId);
+
+        try {
+            const user = await this.getUserEmail(userId);
+            if (!user?.email) return;
+
+            if (batch.count <= 1) {
+                await EmailService.SpedMail(user.email, batch.firstTitle, batch.firstMessage);
+                return;
+            }
+
+            const subject = 'You have new notifications on MentorMatch';
+            const content = `You have ${batch.count} new notifications to read on MentorMatch. Open the notifications page to see all updates.`;
+            await EmailService.SpedMail(user.email, subject, content);
+        } catch (error) {
+            console.error('Notification email aggregation error:', error);
         }
     }
 
@@ -51,12 +94,12 @@ class NotificationService {
      * Notifica per prenotazione accettata
      */
     static async notifyBookingAccepted(menteeId, mentorName, appointmentDate, meetingLink) {
-        const titolo = '✅ Prenotazione Confermata';
-        const messaggio = `${mentorName} ha accettato la tua prenotazione per il ${appointmentDate}. Link videocall: ${meetingLink}`;
+        const titolo = '✅ Booking Confirmed';
+        const messaggio = `${mentorName} accepted your booking for ${appointmentDate}. Video call link: ${meetingLink}`;
         
         await this.create(
             menteeId,
-            'Nuova Prenotazione',
+            'New Booking',
             titolo,
             messaggio,
             { appointmentDate, meetingLink }
@@ -67,12 +110,12 @@ class NotificationService {
      * Notifica per prenotazione rifiutata
      */
     static async notifyBookingRejected(menteeId, mentorName, appointmentDate) {
-        const titolo = '❌ Prenotazione Rifiutata';
-        const messaggio = `${mentorName} non può accettare la tua prenotazione per il ${appointmentDate}. Il pagamento sarà rimborsato.`;
+        const titolo = '❌ Booking Declined';
+        const messaggio = `${mentorName} cannot accept your booking for ${appointmentDate}. Your payment will be refunded.`;
         
         await this.create(
             menteeId,
-            'Annullamento Prenotazione',
+            'Booking Cancellation',
             titolo,
             messaggio,
             { appointmentDate }
@@ -83,12 +126,12 @@ class NotificationService {
      * Notifica per nuova prenotazione (al mentor)
      */
     static async notifyNewBooking(mentorId, menteeName, appointmentDate) {
-        const titolo = '📅 Nuova Prenotazione';
-        const messaggio = `${menteeName} ha prenotato una sessione per il ${appointmentDate}. Vai al pannello per accettare o rifiutare.`;
+        const titolo = '📅 New Booking';
+        const messaggio = `${menteeName} booked a session for ${appointmentDate}. Go to your dashboard to accept or decline.`;
         
         await this.create(
             mentorId,
-            'Nuova Prenotazione',
+            'New Booking',
             titolo,
             messaggio,
             { appointmentDate }
@@ -99,12 +142,12 @@ class NotificationService {
      * Notifica per cancellazione appuntamento
      */
     static async notifyAppointmentCancelled(userId, cancelledBy, reason, appointmentDate) {
-        const titolo = '🚫 Appuntamento Cancellato';
-        const messaggio = `L'appuntamento del ${appointmentDate} è stato cancellato da ${cancelledBy}. Motivo: ${reason}`;
+        const titolo = '🚫 Appointment Canceled';
+        const messaggio = `The appointment on ${appointmentDate} was canceled by ${cancelledBy}. Reason: ${reason}`;
         
         await this.create(
             userId,
-            'Annullamento Prenotazione',
+            'Booking Cancellation',
             titolo,
             messaggio,
             { appointmentDate, reason }
@@ -115,16 +158,15 @@ class NotificationService {
      * Notifica per nuovo messaggio
      */
     static async notifyNewMessage(userId, senderName) {
-        const titolo = '💬 Nuovo Messaggio';
-        const messaggio = `Hai ricevuto un nuovo messaggio da ${senderName}`;
+        const titolo = '💬 New Message';
+        const messaggio = `You received a new message from ${senderName}`;
         
         await this.create(
             userId,
-            'Nuovo Messaggio',
+            'New Message',
             titolo,
             messaggio,
-            {},
-            false // Non inviare email per messaggi
+            {}
         );
     }
 
@@ -132,12 +174,12 @@ class NotificationService {
      * Notifica per nuova recensione
      */
     static async notifyNewReview(mentorId, menteeName, rating) {
-        const titolo = '⭐ Nuova Recensione';
-        const messaggio = `${menteeName} ha lasciato una recensione (${rating}/5 stelle)`;
+        const titolo = '⭐ New Review';
+        const messaggio = `${menteeName} left a review (${rating}/5 stars)`;
         
         await this.create(
             mentorId,
-            'Nuovo Messaggio',
+            'New Message',
             titolo,
             messaggio,
             { rating }
@@ -148,14 +190,68 @@ class NotificationService {
      * Notifica per risposta a recensione
      */
     static async notifyReviewReply(menteeId, mentorName) {
-        const titolo = '💭 Risposta alla Recensione';
-        const messaggio = `${mentorName} ha risposto alla tua recensione`;
+        const titolo = '💭 Review Reply';
+        const messaggio = `${mentorName} replied to your review`;
         
         await this.create(
             menteeId,
-            'Nuovo Messaggio',
+            'New Message',
             titolo,
             messaggio
+        );
+    }
+
+    static async notifyMentorPayout(mentorId, amountNet, amountGross, feeAmount, ibanMasked) {
+        const titolo = '💸 Payout Received';
+        const messaggio = `A payout of €${Number(amountNet || 0).toFixed(2)} was sent to your IBAN ${ibanMasked}. Gross: €${Number(amountGross || 0).toFixed(2)}, platform fee: €${Number(feeAmount || 0).toFixed(2)}.`;
+
+        await this.create(
+            mentorId,
+            'Payment',
+            titolo,
+            messaggio,
+            { amountNet, amountGross, feeAmount, ibanMasked }
+        );
+    }
+
+    static async notifyMenteePaymentCompleted(menteeId, mentorName, amountPaid, appointmentDate, appointmentTime) {
+        const paid = Number(amountPaid || 0).toFixed(2);
+        const mentor = mentorName || 'your mentor';
+        const when = [appointmentDate, appointmentTime].filter(Boolean).join(' at ');
+        const suffix = when ? ` for ${when}` : '';
+
+        const titolo = '💳 Payment Completed';
+        const messaggio = `Your payment of €${paid}${suffix} with ${mentor} has been completed successfully.`;
+
+        await this.create(
+            menteeId,
+            'Payment',
+            titolo,
+            messaggio,
+            { amountPaid, mentorName: mentorName || null, appointmentDate: appointmentDate || null, appointmentTime: appointmentTime || null }
+        );
+    }
+
+    static async notifyMenteeRefundIssued(menteeId, mentorName, refundAmount, appointmentDate, appointmentTime) {
+        const amount = Number(refundAmount || 0).toFixed(2);
+        const mentor = mentorName || 'your mentor';
+        const when = [appointmentDate, appointmentTime].filter(Boolean).join(' at ');
+        const suffix = when ? ` for ${when}` : '';
+
+        const titolo = '💸 Refund Issued';
+        const messaggio = `Your payment of €${amount}${suffix} with ${mentor} has been refunded because the mentor cancelled the appointment.`;
+
+        await this.create(
+            menteeId,
+            'Payment',
+            titolo,
+            messaggio,
+            {
+                refundAmount,
+                mentorName: mentorName || null,
+                appointmentDate: appointmentDate || null,
+                appointmentTime: appointmentTime || null,
+            }
         );
     }
 

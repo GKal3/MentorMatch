@@ -1,5 +1,14 @@
-// Script per visualizzare lo storico pagamenti
+// Script to display payment history
 document.addEventListener('DOMContentLoaded', async () => {
+    if (!requireAuth()) return;
+
+    const user = getCurrentUser();
+    const role = String(user?.ruolo || '').toLowerCase();
+    if (role === 'mentor') {
+        window.location.href = '/pages/earnings.html';
+        return;
+    }
+
     await loadPaymentHistory();
 });
 
@@ -38,7 +47,7 @@ async function loadPaymentHistory() {
             return;
         }
 
-        // Renderizza i pagamenti
+        // Render payments
         paymentsList.innerHTML = payments.map(payment => renderPaymentCard(payment)).join('');
 
     } catch (error) {
@@ -49,17 +58,18 @@ async function loadPaymentHistory() {
 }
 
 function renderPaymentCard(payment) {
-    const date = new Date(payment.Data_Pagamento || payment.data_pagamento).toLocaleDateString('it-IT');
+    const rawDate = payment.Data || payment.data || payment.Data_Pagamento || payment.data_pagamento;
+    const date = rawDate ? new Date(rawDate).toLocaleDateString('en-US') : 'N/A';
     const amount = parseFloat(payment.Importo || payment.importo || 0);
-    const status = payment.Stato || payment.stato || 'Unknown';
-    const method = payment.Metodo_Pagamento || payment.metodo_pagamento || 'N/A';
+    const statusRaw = payment.Stato || payment.stato || 'Unknown';
+    const method = payment.Metodo_Pagamento || payment.metodo_pagamento || payment.Metodo || payment.metodo || 'N/A';
     const mentorName = payment.mentor_nome && payment.mentor_cognome 
         ? `${payment.mentor_nome} ${payment.mentor_cognome}` 
         : 'N/A';
     const settore = payment.Settore || payment.settore || 'N/A';
 
-    const statusClass = status === 'Completato' ? 'status-completed' : 
-                       status === 'In attesa' ? 'status-pending' : 'status-failed';
+    const status = normalizePaymentStatus(statusRaw);
+    const statusClass = paymentStatusClass(statusRaw);
 
     return `
         <div class="payment-card">
@@ -86,4 +96,22 @@ function renderPaymentCard(payment) {
             </div>
         </div>
     `;
+}
+
+function normalizePaymentStatus(status) {
+    const s = String(status || '').toLowerCase();
+    if (s.includes('complet') || s.includes('completed')) return 'Completed';
+    if (s.includes('attesa') || s.includes('pending')) return 'Pending';
+    if (s.includes('annull') || s.includes('cancel')) return 'Cancelled';
+    if (s.includes('fallit') || s.includes('failed') || s.includes('errore') || s.includes('error')) return 'Failed';
+    return status || 'Unknown';
+}
+
+function paymentStatusClass(status) {
+    const s = String(status || '').toLowerCase();
+    if (s.includes('complet') || s.includes('completed')) return 'status-completed';
+    if (s.includes('attesa') || s.includes('pending')) return 'status-pending';
+    if (s.includes('annull') || s.includes('cancel')) return 'status-failed';
+    if (s.includes('fallit') || s.includes('failed') || s.includes('errore') || s.includes('error')) return 'status-failed';
+    return 'status-failed';
 }

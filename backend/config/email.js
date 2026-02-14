@@ -15,6 +15,7 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASSWORD,
   },
   connectionTimeout: 5000,
+  family: 4,
 });
 
 transporter.verify((error, success) => {

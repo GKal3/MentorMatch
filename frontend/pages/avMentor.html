@@ -10,67 +10,82 @@
     <header>
         <img class="logo" alt="Logo" src="../assets/Logo.svg" />
         <nav>
-            <a href="dashboardMentor.html">DASHBOARD</a>
-            <a href="messages.html">MESSAGES</a>
+            <a href="index.html">HOME</a>
+            <a href="notification.html">NOTIFICATIONS</a>
             <a href="#">LOGOUT</a>
         </nav>
     </header>
 
-    <div class="availability-container">
-        <h1 style="text-align: center; margin-bottom: 30px;">Gestione Disponibilità Settimanale</h1>
+    <div class="sidebar">
+        <a href="dashboardMentor.html">Dashboard</a>
+        <a href="#" class="active">Availability</a>
+        <a href="chat.html">Messages</a>
+        <a href="appointmentsMentor.html">Appointments</a>
+        <a href="reviewsMentor.html">Reviews</a>
+        <a href="earnings.html">Earnings</a>
+    </div>
+
+    <div class="availability-container availability-with-sidebar">
+        <div class="welcome-section availability-title-section">
+            <h1>Weekly Availability Management</h1>
+            <p style="color: #666;">Set and manage your weekly time slots</p>
+        </div>
 
         <div class="calendar-section">
             <div class="calendar-header">
-                <h2 id="current-month">Disponibilità Settimanale Ricorrente</h2>
-                <p style="color: #666; font-size: 14px; margin-top: 10px;">Seleziona i giorni della settimana e gli orari in cui sei disponibile</p>
+                <div>
+                    <h2 id="current-month">Recurring Weekly Availability</h2>
+                    <p style="color: #666; font-size: 14px; margin-top: 10px;">Select the days and times when you are available</p>
+                </div>
+                <label style="display:flex; align-items:center; gap:8px; font-size:14px; color:#666;">
+                    <input type="checkbox" id="multi-day-checkbox" />
+                    Apply the same range to multiple days
+                </label>
             </div>
             
             <div class="weekdays-grid" id="weekdays-grid">
-                <div class="weekday-card" data-day="Lunedì">
-                    <div class="weekday-header">Lunedì</div>
+                <div class="weekday-card" data-day="Monday">
+                    <div class="weekday-header">Monday</div>
                     <div class="weekday-indicator"></div>
                 </div>
-                <div class="weekday-card" data-day="Martedì">
-                    <div class="weekday-header">Martedì</div>
+                <div class="weekday-card" data-day="Tuesday">
+                    <div class="weekday-header">Tuesday</div>
                     <div class="weekday-indicator"></div>
                 </div>
-                <div class="weekday-card" data-day="Mercoledì">
-                    <div class="weekday-header">Mercoledì</div>
+                <div class="weekday-card" data-day="Wednesday">
+                    <div class="weekday-header">Wednesday</div>
                     <div class="weekday-indicator"></div>
                 </div>
-                <div class="weekday-card" data-day="Giovedì">
-                    <div class="weekday-header">Giovedì</div>
+                <div class="weekday-card" data-day="Thursday">
+                    <div class="weekday-header">Thursday</div>
                     <div class="weekday-indicator"></div>
                 </div>
-                <div class="weekday-card" data-day="Venerdì">
-                    <div class="weekday-header">Venerdì</div>
+                <div class="weekday-card" data-day="Friday">
+                    <div class="weekday-header">Friday</div>
                     <div class="weekday-indicator"></div>
                 </div>
-                <div class="weekday-card" data-day="Sabato">
-                    <div class="weekday-header">Sabato</div>
+                <div class="weekday-card" data-day="Saturday">
+                    <div class="weekday-header">Saturday</div>
                     <div class="weekday-indicator"></div>
                 </div>
-                <div class="weekday-card" data-day="Domenica">
-                    <div class="weekday-header">Domenica</div>
+                <div class="weekday-card" data-day="Sunday">
+                    <div class="weekday-header">Sunday</div>
                     <div class="weekday-indicator"></div>
                 </div>
             </div>
         </div>
 
         <div class="time-slots-section">
-            <div class="section-title" id="selected-date-title">Seleziona un giorno della settimana</div>
-            <p style="margin-bottom: 15px; color: #666;">Clicca sugli slot orari per segnarli come disponibili. Verde = Disponibile, Arancione = Prenotato</p>
-            <p style="margin-bottom: 20px; color: #2196F3; font-size: 14px; font-weight: 600;">
-                💡 Puoi selezionare più giorni! Clicca su altri giorni per impostare i loro orari, poi salva tutto insieme.
-            </p>
-            
+            <div class="section-title" id="selected-date-title">Select a day of the week</div>
             <div class="time-slots-grid" id="time-slots-grid">
             </div>
         </div>
 
-        <button class="save-btn">Salva Disponibilità</button>
+        <button class="submit-btn">Save Availability</button>
 
     </div>
+
+    <div id="availability-toast" class="availability-toast" aria-live="polite" aria-atomic="true"></div>
 
     <div id="subscriptionPopup" class="subscription-popup">
         <div class="popup-content" style="position: relative;">

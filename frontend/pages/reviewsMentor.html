@@ -10,14 +10,27 @@
     <header>
         <img class="logo" alt="Logo" src="../assets/Logo.svg" />
         <nav>
-            <a href="/pages/dashboardMentor.html">DASHBOARD</a>
-            <a href="/pages/chat.html">MESSAGES</a>
+            <a href="index.html">HOME</a>
+            <a href="/pages/notification.html">NOTIFICATIONS</a>
             <a href="#logout">LOGOUT</a>
         </nav>
     </header>
 
+    <div class="sidebar">
+        <a href="dashboardMentor.html">Dashboard</a>
+        <a href="avMentor.html">Availability</a>
+        <a href="chat.html">Messages</a>
+        <a href="appointmentsMentor.html">Appointments</a>
+        <a href="reviewsMentor.html" class="active">Reviews</a>
+        <a href="earnings.html">Earnings</a>
+    </div>
+
+    <div class="dashboard-container" style="margin-left: 220px;">
+        <div class="welcome-section">
+            <h1 style="margin-bottom: 10px;">My Reviews & Ratings</h1>
+        </div>
+
     <div class="reviews-container">
-        <div class="page-title">My Reviews & Ratings</div>
 
         <section class="stats-header">
             <div class="overall-rating">
@@ -26,53 +39,34 @@
                 <div class="stat-label" id="reviewCountLabel">Based on 0 reviews</div>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-box">
-                    <div id="totalReviews" class="stat-number">0</div>
-                    <div class="stat-label">Total Reviews</div>
-                </div>
-                <div class="stat-box">
-                    <div id="fiveStarCount" class="stat-number">0</div>
-                    <div class="stat-label">5-Star Reviews</div>
-                </div>
-                <div class="stat-box">
-                    <div id="fourStarCount" class="stat-number">0</div>
-                    <div class="stat-label">4-Star Reviews</div>
-                </div>
-                <div class="stat-box">
-                    <div id="threeStarCount" class="stat-number">0</div>
-                    <div class="stat-label">3 Stars or less</div>
-                </div>
-            </div>
-        </section>
+            <div class="rating-breakdown">
+                <div class="section-title">Rating Breakdown</div>
 
-        <section class="rating-breakdown">
-            <div class="section-title">Rating Breakdown</div>
-
-            <div class="breakdown-item">
-                <div class="breakdown-label">5 Stars</div>
-                <div class="breakdown-bar-container"><div id="bar5" class="breakdown-bar" style="width: 0%;"></div></div>
-                <div id="val5" class="breakdown-value">0</div>
-            </div>
-            <div class="breakdown-item">
-                <div class="breakdown-label">4 Stars</div>
-                <div class="breakdown-bar-container"><div id="bar4" class="breakdown-bar" style="width: 0%;"></div></div>
-                <div id="val4" class="breakdown-value">0</div>
-            </div>
-            <div class="breakdown-item">
-                <div class="breakdown-label">3 Stars</div>
-                <div class="breakdown-bar-container"><div id="bar3" class="breakdown-bar" style="width: 0%;"></div></div>
-                <div id="val3" class="breakdown-value">0</div>
-            </div>
-            <div class="breakdown-item">
-                <div class="breakdown-label">2 Stars</div>
-                <div class="breakdown-bar-container"><div id="bar2" class="breakdown-bar" style="width: 0%;"></div></div>
-                <div id="val2" class="breakdown-value">0</div>
-            </div>
-            <div class="breakdown-item">
-                <div class="breakdown-label">1 Star</div>
-                <div class="breakdown-bar-container"><div id="bar1" class="breakdown-bar" style="width: 0%;"></div></div>
-                <div id="val1" class="breakdown-value">0</div>
+                <div class="breakdown-item">
+                    <div class="breakdown-label">5 Stars</div>
+                    <div class="breakdown-bar-container"><div id="bar5" class="breakdown-bar" style="width: 0%;"></div></div>
+                    <div id="val5" class="breakdown-value">0</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-label">4 Stars</div>
+                    <div class="breakdown-bar-container"><div id="bar4" class="breakdown-bar" style="width: 0%;"></div></div>
+                    <div id="val4" class="breakdown-value">0</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-label">3 Stars</div>
+                    <div class="breakdown-bar-container"><div id="bar3" class="breakdown-bar" style="width: 0%;"></div></div>
+                    <div id="val3" class="breakdown-value">0</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-label">2 Stars</div>
+                    <div class="breakdown-bar-container"><div id="bar2" class="breakdown-bar" style="width: 0%;"></div></div>
+                    <div id="val2" class="breakdown-value">0</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-label">1 Star</div>
+                    <div class="breakdown-bar-container"><div id="bar1" class="breakdown-bar" style="width: 0%;"></div></div>
+                    <div id="val1" class="breakdown-value">0</div>
+                </div>
             </div>
         </section>
 
@@ -86,10 +80,11 @@
         </div>
 
         <section class="reviews-list">
-            <div class="section-title">Recent Reviews</div>
+            <div class="section-title">All Reviews</div>
             <div id="reviewsEmpty" class="empty-state">No reviews yet.</div>
             <div id="reviewsItems"></div>
         </section>
+    </div>
     </div>
 
     <script src="../js/utils.js"></script>

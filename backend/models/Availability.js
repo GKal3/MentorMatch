@@ -10,10 +10,18 @@ class Availability {
     }
 
     static async deleteAvailability(idUtente, giorno, ora_inizio, ora_fine) {
-        await pool.query(
-            'DELETE FROM "Disponibilita" WHERE "Id_Utente" = $1 AND "Giorno" = $2 AND "Ora_Inizio" = $3 AND "Ora_Fine" = $4',
+        const result = await pool.query(
+            `
+            DELETE FROM "Disponibilita"
+            WHERE "Id_Utente" = $1
+              AND "Giorno" = $2
+              AND "Ora_Inizio"::time = $3::time
+              AND "Ora_Fine"::time = $4::time
+            `,
             [idUtente, giorno, ora_inizio, ora_fine]
         );
+
+        return result.rowCount;
     }
 
     static async addAvailability(idUtente, disponibilita) {

@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const searchInput = document.querySelector('.search-input');
     const categorySelect = document.querySelector('select[name="category"]');
     const languageSelect = document.querySelector('select[name="language"]');
-    const priceSelect = document.querySelector('select[name="price"]');
+    const ratingSelect = document.querySelector('select[name="rating"]');
+    const availabilityDayCheckboxes = document.querySelectorAll('input[name="availabilityDay"]');
 
     // Carica le categorie e le lingue dal database
     await loadCategoriesAndLanguages();
@@ -27,7 +28,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadCategoriesAndLanguages() {
         try {
             // Carica un mentor qualsiasi per ottenere le opzioni disponibili
-            const response = await fetch('/api/mentee/search?settore=&lingua=&prezzo_max=', {
+            const response = await fetch('/api/mentee/search', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -58,7 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loadCategoryChips(categories);
             }
         } catch (error) {
-            console.error('Errore nel caricamento delle categorie e lingue:', error);
+            console.error('Error loading categories and languages:', error);
         }
     }
 
@@ -115,8 +116,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const category = categorySelect?.value;
             const language = languageSelect?.value;
-            const priceRange = priceSelect?.value;
+            const ratingMin = ratingSelect?.value;
             const searchTerm = searchInput?.value;
+            const selectedDays = Array.from(availabilityDayCheckboxes)
+                .filter((checkbox) => checkbox.checked)
+                .map((checkbox) => checkbox.value);
 
             if (category && category !== 'All Categories') {
                 params.append('settore', category);
@@ -126,12 +130,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 params.append('lingua', language);
             }
             
-            if (priceRange && priceRange !== 'All Prices') {
-                // Estrai il prezzo massimo dal range
-                const maxPrice = priceRange.match(/€(\d+)/)?.[1];
-                if (maxPrice) {
-                    params.append('prezzo_max', maxPrice);
-                }
+            // Availability is filtered client-side to guarantee OR behavior
+            // across multiple selected days (at least one selected day).
+
+            if (ratingMin) {
+                params.append('rating_min', ratingMin);
             }
 
             if (searchTerm) {
@@ -148,20 +151,66 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (response.ok) {
                 const result = await response.json();
+                const filteredMentors = applyClientSideFilters(result.data || [], selectedDays, ratingMin);
                 
                 // Salva i risultati nel sessionStorage per passarli alla pagina mentorList
-                sessionStorage.setItem('mentorResults', JSON.stringify(result.data));
+                sessionStorage.setItem('mentorResults', JSON.stringify(filteredMentors));
                 
                 // Redirect alla pagina mentorList
                 window.location.href = '/pages/mentorList.html';
             } else {
                 const error = await response.json();
-                console.error('Errore nella ricerca:', error);
-                alert('Errore durante la ricerca: ' + (error.message || 'Riprova.'));
+                console.error('Search error:', error);
+                alert('Error during search: ' + (error.message || 'Please try again.'));
             }
         } catch (error) {
-            console.error('Errore completo:', error);
-            alert('Errore di connessione: ' + error.message);
+            console.error('Connection error:', error);
+            alert('Connection error: ' + error.message);
         }
+    }
+
+    function applyClientSideFilters(mentors, selectedDays, ratingMin) {
+        const selectedDaySet = new Set(
+            (selectedDays || [])
+                .map((day) => String(day).trim())
+                .filter((day) => ['1', '2', '3', '4', '5', '6', '7'].includes(day))
+        );
+        const minRating = ratingMin ? Number(ratingMin) : null;
+
+        return (mentors || []).filter((mentor) => {
+            const mentorRating = Number(mentor?.media_recensioni || 0);
+            if (minRating !== null && !Number.isNaN(minRating) && mentorRating < minRating) {
+                return false;
+            }
+
+            if (selectedDaySet.size > 0) {
+                const mentorDays = normalizeMentorDays(mentor?.giorni_disponibili);
+                const hasMatchingDay = mentorDays.some((day) => selectedDaySet.has(day));
+                if (!hasMatchingDay) {
+                    return false;
+                }
+            }
+
+            return true;
+        });
+    }
+
+    function normalizeMentorDays(rawDays) {
+        if (Array.isArray(rawDays)) {
+            return rawDays
+                .map((day) => String(day).trim())
+                .filter((day) => ['1', '2', '3', '4', '5', '6', '7'].includes(day));
+        }
+
+        if (typeof rawDays === 'string') {
+            const cleaned = rawDays.replace(/[{}\[\]\s]/g, '');
+            if (!cleaned) return [];
+            return cleaned
+                .split(',')
+                .map((day) => String(day).trim())
+                .filter((day) => ['1', '2', '3', '4', '5', '6', '7'].includes(day));
+        }
+
+        return [];
     }
 });

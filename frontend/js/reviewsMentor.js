@@ -31,7 +31,7 @@ async function loadStats(mentorId, token) {
     const stats = res.ok ? await res.json() : {};
     renderStats(stats || {});
   } catch (err) {
-    console.error('Errore caricamento statistiche recensioni:', err);
+    console.error('Error loading review stats:', err);
     renderStats({});
   }
 }
@@ -43,7 +43,7 @@ async function loadReviews(mentorId, token) {
     });
     reviewsData = res.ok ? (await res.json()) || [] : [];
   } catch (err) {
-    console.error('Errore caricamento recensioni:', err);
+    console.error('Error loading reviews:', err);
     reviewsData = [];
   }
   renderReviews();

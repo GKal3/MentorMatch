@@ -26,27 +26,27 @@ async function handleSubmit(e) {
     
     // Validazione base
     if (!formData.nome || !formData.cognome || !formData.mail || !formData.password) {
-        alert('Compila tutti i campi obbligatori (nome, cognome, email, password)');
+        alert('Please fill in all required fields (first name, last name, email, password)');
         return;
     }
     
     if (!formData.data_nascita || !formData.genere) {
-        alert('Compila data di nascita e genere');
+        alert('Please provide date of birth and gender');
         return;
     }
     
     if (!formData.occupazione) {
-        alert('Inserisci la tua occupazione attuale');
+        alert('Please enter your current occupation');
         return;
     }
     
     if (formData.password.length < 6) {
-        alert('La password deve essere di almeno 6 caratteri');
+        alert('Password must be at least 6 characters');
         return;
     }
     
     if (formData.password !== confirmPassword) {
-        alert('Le password non corrispondono');
+        alert('Passwords do not match');
         return;
     }
     
@@ -68,16 +68,16 @@ async function handleSubmit(e) {
             localStorage.setItem('token', result.token);
             localStorage.setItem('user', JSON.stringify(result.user));
             
-            alert('Registrazione completata con successo! Benvenuto/a ' + formData.nome + '!');
+            alert('Registration completed successfully! Welcome ' + formData.nome + '!');
             
-            // Redirect alla pagina di ricerca mentor o login
-            window.location.href = '/pages/search.html';
+            // Redirect alla dashboard mentee
+            window.location.href = '/pages/dashboardMentee.html';
         } else {
-            alert('Errore: ' + result.message);
+            alert('Error: ' + result.message);
         }
         
     } catch (error) {
-        console.error('Errore nella registrazione:', error);
-        alert('Errore nella registrazione: ' + error.message);
+        console.error('Registration error:', error);
+        alert('Registration error: ' + error.message);
     }
 }

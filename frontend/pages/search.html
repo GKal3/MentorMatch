@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Search Mentors - MentorMatch</title>
     <link rel="stylesheet" href="../css/style.css" />
-    <script src="../js/searchMentors.js"></script>
+    <script src="../js/searchMentors.js?v=20260214"></script>
 </head>
 <body>
     <header>
         <img class="logo" alt="Logo" src="../assets/Logo.svg" />
         <nav>
             <a href="index.html">HOME</a>
-            <a href="/pages/search.html">SEARCH FOR MENTORS</a>
             <a href="/pages/regMentor.html">WORK WITH US</a>
+            <a href="/pages/login.html" class="btn btn-primary" style="padding: 10px 24px; font-size: 14px;">LOGIN</a>
         </nav>
     </header>
 
@@ -28,28 +28,42 @@
         </div>
 
         <div class="filters">
-            <div class="filter-group">
+            <div class="filter-group filter-group--category">
                 <label>Category</label>
                 <select name="category">
                     <option>All Categories</option>
                 </select>
             </div>
 
-            <div class="filter-group">
+            <div class="filter-group filter-group--language">
                 <label>Language</label>
                 <select name="language">
                     <option>All Languages</option>
                 </select>
             </div>
 
-            <div class="filter-group">
-                <label>Price Range</label>
-                <select name="price">
-                    <option>All Prices</option>
-                    <option>€0 - €50</option>
-                    <option>€50 - €100</option>
-                    <option>€100+</option>
+            <div class="filter-group filter-group--reviews">
+                <label>Reviews</label>
+                <select name="rating">
+                    <option value="">All ratings</option>
+                    <option value="2">2 stars and up</option>
+                    <option value="3">3 stars and up</option>
+                    <option value="4">4 stars and up</option>
+                    <option value="5">5 stars only</option>
                 </select>
+            </div>
+
+            <div class="filter-group filter-group--availability">
+                <label>Availability</label>
+                <div class="availability-days-filter">
+                    <label><input type="checkbox" name="availabilityDay" value="1"> Mon</label>
+                    <label><input type="checkbox" name="availabilityDay" value="2"> Tue</label>
+                    <label><input type="checkbox" name="availabilityDay" value="3"> Wed</label>
+                    <label><input type="checkbox" name="availabilityDay" value="4"> Thu</label>
+                    <label><input type="checkbox" name="availabilityDay" value="5"> Fri</label>
+                    <label><input type="checkbox" name="availabilityDay" value="6"> Sat</label>
+                    <label><input type="checkbox" name="availabilityDay" value="7"> Sun</label>
+                </div>
             </div>
         </div>
 
@@ -64,5 +78,6 @@
         </div>
     </div>
 
+    <script src="../js/utils.js"></script>
 </body>
 </html>

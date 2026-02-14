@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load pending payment details from storage
   pendingPayment = JSON.parse(sessionStorage.getItem('pendingPayment') || localStorage.getItem('pendingPayment') || 'null');
   if (!pendingPayment || !pendingPayment.prezzo || pendingPayment.prezzo <= 0) {
-    alert('Nessun pagamento necessario o dati mancanti.');
+    alert('No payment required or missing data.');
     window.location.href = '/pages/dashboardMentee.html';
     return;
   }
@@ -58,25 +58,32 @@ function renderSummary(pp) {
   const avatar = document.querySelector('.summary-avatar');
   const nameEl = document.querySelector('.summary-mentor-name');
   const dateEl = document.querySelector('.summary-mentor-date');
-  const items = document.querySelectorAll('.summary-item');
-  const totalEl = document.querySelector('.summary-total span:last-child');
+  const sessionPriceEl = document.getElementById('summarySessionPrice');
+  const platformFeeEl = document.getElementById('summaryPlatformFee');
+  const totalEl = document.getElementById('summaryTotal');
+  const dateEls = document.querySelectorAll('.summary-mentor-date');
 
   const initials = `${(pp.mentorNome || '').charAt(0)}${(pp.mentorCognome || '').charAt(0)}`.toUpperCase();
+  const startTime = pp.oraInizio || pp.ora || '';
+  const endTime = pp.oraFine || pp.ora_fine || '';
+  const duration = Number(pp.durataMinuti || 0);
   if (avatar) avatar.textContent = initials || 'MM';
   if (nameEl) nameEl.textContent = `${pp.mentorNome || ''} ${pp.mentorCognome || ''}`.trim();
-  if (dateEl) dateEl.textContent = `${pp.data || ''} ${pp.ora || ''}`.trim();
+  if (dateEls.length > 0) {
+    dateEls[0].textContent = `${pp.data || ''} ${startTime}${endTime ? ` - ${endTime}` : ''}`.trim();
+  }
+  if (dateEls.length > 1) {
+    dateEls[1].textContent = duration ? `${duration} min session` : 'Session';
+  }
 
   // Price composition
   const sessionPrice = Number(pp.prezzo || 0);
-  const platformFee = Number(pp.platformFee || 5);
-  const tax = Number(pp.tax || (sessionPrice * 0.22));
-  const total = sessionPrice + platformFee + tax;
+  const feePercent = Number(pp.feePercent || 15);
+  const platformFee = Number(pp.feeAmount || ((sessionPrice * feePercent) / 100));
+  const total = sessionPrice;
 
-  if (items && items.length >= 3) {
-    items[0].querySelector('span:last-child').textContent = `€${sessionPrice.toFixed(2)}`;
-    items[1].querySelector('span:last-child').textContent = `€${platformFee.toFixed(2)}`;
-    items[2].querySelector('span:last-child').textContent = `€${tax.toFixed(2)}`;
-  }
+  if (sessionPriceEl) sessionPriceEl.textContent = `€${sessionPrice.toFixed(2)}`;
+  if (platformFeeEl) platformFeeEl.textContent = `€${platformFee.toFixed(2)}`;
   if (totalEl) totalEl.textContent = `€${total.toFixed(2)}`;
 }
 
@@ -85,13 +92,15 @@ async function onSubmitPayment(e) {
   if (!pendingPayment) return;
 
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-  const activeTabIsCard = document.getElementById('cardTab')?.classList.contains('active');
+  const isPaypalClick = e.currentTarget?.classList.contains('paypal-btn');
+  const activeTabIsCard = !isPaypalClick && document.getElementById('cardTab')?.classList.contains('active');
 
   try {
     if (activeTabIsCard) {
       // Card payment: require a Stripe token (placeholder for demo)
+      console.log('💳 Card payment initiated');
       const tokenStripe = 'tok_visa'; // Integrazione reale: raccogli token dalla UI
-      const res = await fetch('http://localhost:3000/api/payments/card', {
+      const res = await fetch('/api/payments/card', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -103,12 +112,17 @@ async function onSubmitPayment(e) {
         })
       });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Errore pagamento carta');
-      alert('Pagamento con carta completato!');
-      cleanupAndRedirect();
+      console.log('💳 Card payment response:', data);
+      if (!res.ok || !data.success) throw new Error(data.error || 'Card payment error');
+      
+      // Per carta, salviamo un flag e reindirizzamo a payment-success
+      sessionStorage.setItem('paymentMethod', 'card');
+      sessionStorage.removeItem('pendingPayment');
+      localStorage.removeItem('pendingPayment');
+      window.location.href = '/pages/payment-success.html';
     } else {
       // PayPal flow: get approval URL
-      const res = await fetch('http://localhost:3000/api/payments/paypal', {
+      const res = await fetch('/api/payments/paypal', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -119,18 +133,29 @@ async function onSubmitPayment(e) {
         })
       });
       const data = await res.json();
-      if (!res.ok || !data.success) throw new Error(data.error || 'Errore creazione ordine PayPal');
+      console.log('📤 PayPal Order Creation Response:', data);
+      if (!res.ok || !data.success) throw new Error(data.error || 'Error creating PayPal order');
+
+      // Salva dati ordine per la capture (quando torna da PayPal)
+      const paypalOrderData = {
+        orderId: data.orderId,
+        prenotazioneId: data.prenotazioneId,
+        importo: data.importo
+      };
+      console.log('💾 Saving to sessionStorage:', paypalOrderData);
+      sessionStorage.setItem('paypalOrderData', JSON.stringify(paypalOrderData));
 
       // Redirect to PayPal approval
       if (data.approvalUrl) {
+        console.log('🔗 Redirecting to PayPal:', data.approvalUrl.substring(0, 50) + '...');
         window.location.href = data.approvalUrl;
       } else {
-        alert('URL di approvazione PayPal non disponibile');
+        alert('PayPal approval URL is not available');
       }
     }
   } catch (error) {
-    console.error('Errore pagamento:', error);
-    alert(error.message || 'Errore nel pagamento');
+    console.error('Payment error:', error);
+    alert(error.message || 'Payment error');
   }
 }
 

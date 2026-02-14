@@ -6,6 +6,24 @@ import Payment from '../models/Payment.js';
 import Mentor from '../models/Mentor.js';
 import Availability from '../models/Availability.js';
 import Notification from '../models/Notification.js';
+import NotificationService from '../utils/notificationService.js';
+import { requestEmailChange } from '../utils/emailChangeService.js';
+
+// DATI PERSONALI MENTEE
+export const getPersonalInfo = async (req, res) => {
+  try {
+    console.log('getPersonalInfo chiamato con ID:', req.params.id);
+    const mentee = await Mentee.findByUserId(req.params.id);
+    console.log('Dati mentee trovati:', mentee);
+    if (!mentee) {
+      return res.status(404).json({ error: 'Mentee not found' });
+    }
+    res.json(mentee);
+  } catch (error) {
+    console.error('Errore in getPersonalInfo:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 // AREA RISERVATA MENTEE
 export const AreaPerMentee = async (req, res) => {
@@ -16,7 +34,7 @@ export const AreaPerMentee = async (req, res) => {
     if (!mentee) {
       return res.status(404).json({
         success: false,
-        message: 'Profilo mentee non trovato',
+        message: 'Mentee profile not found',
       });
     }
 
@@ -31,25 +49,35 @@ export const AreaPerMentee = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: 'Errore area mentee' });
+    res.status(500).json({ success: false, message: 'Error loading mentee area' });
   }
 };
 
 // MODIFICA DATI
 export const ModDati = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const { nome, cognome, data_nascita, genere } = req.body;
+    const userId = req.params.id || req.user.id;
+    const { nome, cognome, data_nascita, genere, mail, occupazione, bio } = req.body;
 
-    const result = await User.updateProfile(userId, nome, cognome, data_nascita, genere);
+    const { requested: emailChangeRequested } = await requestEmailChange(userId, mail);
+    const updatedUser = await User.updateProfile(userId, nome, cognome, data_nascita, genere);
+
+    let updatedMentee = null;
+    if (occupazione !== undefined || bio !== undefined) {
+      updatedMentee = await Mentee.updateProfile(userId, { occupazione, bio });
+    }
 
     res.json({
       success: true,
-      message: 'Dati aggiornati con successo',
-      data: result,
+      user: updatedUser,
+      mentee: updatedMentee,
+      emailChangeRequested,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore modifica dati' });
+    console.error(error);
+    res.status(error.status || 500).json({
+      error: error.message || 'Internal server error',
+    });
   }
 };
 
@@ -61,6 +89,8 @@ export const RicercaMentor = async (req, res) => {
       settore: req.query.settore,
       lingua: req.query.lingua,
       prezzo_max: req.query.prezzo_max,
+      disponibilita: req.query.disponibilita,
+      rating_min: req.query.rating_min,
     };
 
     const mentors = await Mentor.searchMentors(filters);
@@ -71,7 +101,7 @@ export const RicercaMentor = async (req, res) => {
       data: mentors,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore ricerca mentor' });
+    res.status(500).json({ success: false, message: 'Error searching mentors' });
   }
 };
 
@@ -89,7 +119,7 @@ export const ApriProfiloMentor = async (req, res) => {
     if (!mentor) {
       return res.status(404).json({
         success: false,
-        message: 'Mentor non trovato',
+        message: 'Mentor not found',
       });
     }
 
@@ -104,7 +134,7 @@ export const ApriProfiloMentor = async (req, res) => {
     });
   } catch (error) {
     console.error('Errore in ApriProfiloMentor:', error); // Debug
-    res.status(500).json({ success: false, message: 'Errore profilo mentor', error: error.message });
+    res.status(500).json({ success: false, message: 'Error loading mentor profile', error: error.message });
   }
 };
 
@@ -112,30 +142,40 @@ export const ApriProfiloMentor = async (req, res) => {
 export const ApriPrenot = async (req, res) => {
   try {
     const menteeUserId = req.user.id;
-    const { id_mentor, giorno, ora } = req.body;
+    const { id_mentor, giorno, ora_inizio, ora_fine } = req.body;
+
+    console.log('Booking request:', { id_mentor, giorno, ora_inizio, ora_fine, menteeUserId });
 
     const mentor = await Mentor.getById(id_mentor);
     if (!mentor) {
-      return res.status(404).json({ success: false, message: 'Mentor non trovato' });
+      console.log('Mentor not found:', id_mentor);
+      return res.status(404).json({ success: false, message: 'Mentor not found' });
     }
 
-    const isSlotAvailable = await Appointment.checkAvailability(id_mentor, giorno, ora);
+    console.log('Checking availability...');
+    const isSlotAvailable = await Appointment.checkAvailability(id_mentor, giorno, ora_inizio, ora_fine);
+    console.log('Slot available:', isSlotAvailable);
+    
     if (!isSlotAvailable) {
-      return res.status(400).json({ success: false, message: 'Slot già prenotato' });
+      console.log('Slot already booked');
+      return res.status(400).json({ success: false, message: 'Slot already booked' });
     }
 
-    const booking = await Appointment.create(id_mentor, menteeUserId, giorno, ora, 'In attesa');
+    console.log('Creating booking...');
+    const booking = await Appointment.create(id_mentor, menteeUserId, giorno, ora_inizio, ora_fine, 'Pending');
+    console.log('Booking created:', booking);
 
-    await Notification.create(
-      id_mentor,
-      'Nuova Prenotazione',
-      'Nuova Prenotazione',
-      `Nuova prenotazione per il ${giorno} alle ${ora}`
-    );
+    console.log('Creating notification...');
+    const menteeUser = await User.getById(menteeUserId);
+    const menteeName = menteeUser ? `${menteeUser.Nome} ${menteeUser.Cognome}` : 'A mentee';
+    const appointmentDate = `${giorno} ${ora_inizio}-${ora_fine}`;
+    await NotificationService.notifyNewBooking(id_mentor, menteeName, appointmentDate);
 
     res.status(201).json({ success: true, data: booking });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore prenotazione' });
+    console.error('Booking error full:', error);
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ success: false, message: 'Booking error', details: error.message });
   }
 };
 
@@ -152,7 +192,7 @@ export const ApriRecMentee = async (req, res) => {
       data: reviews,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore recupero recensioni' });
+    res.status(500).json({ success: false, message: 'Error fetching reviews' });
   }
 };
 
@@ -164,20 +204,20 @@ export const CreaRec = async (req, res) => {
 
     const mentor = await Mentor.getById(id_mentor);
     if (!mentor) {
-      return res.status(404).json({ success: false, message: 'Mentor non trovato' });
+      return res.status(404).json({ success: false, message: 'Mentor not found' });
     }
 
     const hasCompletedSession = await Appointment.hasCompletedSession(menteeUserId, id_mentor);
     if (!hasCompletedSession) {
       return res.status(403).json({
         success: false,
-        message: 'Puoi recensire solo dopo una sessione accettata',
+        message: 'You can review only after an accepted session',
       });
     }
 
     const existingReview = await Review.findByMenteeAndMentor(menteeUserId, id_mentor);
     if (existingReview) {
-      return res.status(400).json({ success: false, message: 'Recensione già presente' });
+      return res.status(400).json({ success: false, message: 'Review already exists' });
     }
 
     const review = await Review.create({
@@ -189,7 +229,7 @@ export const CreaRec = async (req, res) => {
 
     res.status(201).json({ success: true, data: review });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore creazione recensione' });
+    res.status(500).json({ success: false, message: 'Error creating review' });
   }
 };
 
@@ -204,13 +244,13 @@ export const ModRec = async (req, res) => {
     if (!review) {
       return res.status(404).json({
         success: false,
-        message: 'Recensione non trovata',
+        message: 'Review not found',
       });
     }
 
     res.json({ success: true, data: review });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore modifica recensione' });
+    res.status(500).json({ success: false, message: 'Error updating review' });
   }
 };
 
@@ -224,13 +264,13 @@ export const CancRec = async (req, res) => {
     if (!deleted) {
       return res.status(404).json({
         success: false,
-        message: 'Recensione non trovata',
+        message: 'Review not found',
       });
     }
 
-    res.json({ success: true, message: 'Recensione eliminata' });
+    res.json({ success: true, message: 'Review deleted' });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore cancellazione recensione' });
+    res.status(500).json({ success: false, message: 'Error deleting review' });
   }
 };
 
@@ -247,7 +287,7 @@ export const StatoApp = async (req, res) => {
       data: appointments,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore stato appuntamenti' });
+    res.status(500).json({ success: false, message: 'Error fetching appointments' });
   }
 };
 
@@ -264,7 +304,7 @@ export const Storico = async (req, res) => {
       data: payments,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore storico pagamenti' });
+    res.status(500).json({ success: false, message: 'Error fetching payment history' });
   }
 };
 
@@ -279,18 +319,18 @@ export const CancellaApp = async (req, res) => {
     if (!appointment) {
       return res.status(404).json({
         success: false,
-        message: 'Appuntamento non trovato o già annullato',
+        message: 'Appointment not found or already canceled',
       });
     }
 
     res.json({
       success: true,
-      message: 'Appuntamento annullato con successo',
+      message: 'Appointment canceled successfully',
       data: appointment,
     });
   } catch (error) {
     console.error('Error cancelling appointment:', error);
-    res.status(500).json({ success: false, message: 'Errore cancellazione appuntamento' });
+    res.status(500).json({ success: false, message: 'Error canceling appointment' });
   }
 };
 
@@ -307,7 +347,7 @@ export const getAllNot = async (req, res) => {
       data: notifications,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore recupero notifiche' });
+    res.status(500).json({ success: false, message: 'Error fetching notifications' });
   }
 };
 
@@ -315,12 +355,14 @@ export const getAllNot = async (req, res) => {
 export const getNotification = async (req, res) => {
   try {
     const { id } = req.params;
+    const userId = req.user.id;
 
-    const notification = await Notification.getNotificationById(id);
+    await Notification.markAsRead(id, userId);
+    const notification = await Notification.getNotificationByIdForUser(id, userId);
     if (!notification) {
       return res.status(404).json({
         success: false,
-        message: 'Notifica non trovata',
+        message: 'Notification not found',
       });
     }
 
@@ -329,6 +371,56 @@ export const getNotification = async (req, res) => {
       data: notification,
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Errore recupero notifica' });
+    res.status(500).json({ success: false, message: 'Error fetching notification' });
+  }
+};
+
+export const getUnreadCount = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const unreadCount = await Notification.getUnreadCount(userId);
+
+    res.json({
+      success: true,
+      unreadCount,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error fetching unread notifications count' });
+  }
+};
+
+export const markAllNotificationsAsRead = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const updatedCount = await Notification.markAllAsRead(userId);
+
+    res.json({
+      success: true,
+      updatedCount,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error marking all notifications as read' });
+  }
+};
+
+export const markNotificationAsRead = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+    const notification = await Notification.markAsRead(id, userId);
+
+    if (!notification) {
+      return res.status(404).json({
+        success: false,
+        message: 'Notification not found',
+      });
+    }
+
+    res.json({
+      success: true,
+      data: notification,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Error marking notification as read' });
   }
 };

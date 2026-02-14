@@ -14,6 +14,6 @@ export const GetFilterOptions = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ success: false, message: 'Errore recupero opzioni' });
+    res.status(500).json({ success: false, message: 'Error fetching options' });
   }
 };

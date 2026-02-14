@@ -10,165 +10,111 @@
     <header>
         <img class="logo" alt="Logo" src="../assets/Logo.svg" />
         <nav>
-            <a href="/pages/dashboardMentee.html">DASHBOARD</a>
-            <a href="/pages/appArea.html">MY SESSIONS</a>
-            <a href="/pages/chat.html">CHAT</a>
+            <a href="/pages/index.html">HOME</a>
+            <a href="/pages/search.html">SEARCH FOR MENTORS</a>
+            <a href="/pages/login.html" class="btn btn-primary" style="padding: 10px 24px; font-size: 14px;">LOGIN</a>
         </nav>
     </header>
 
     <div class="review-container">
-        <h1 style="text-align: center; margin-bottom: 30px;">Share Your Experience</h1>
+        <div class="review-layout">
+            <div class="review-left-column">
+                <div class="session-summary mentor-recap-card" id="mentorRecap">
+                    <div class="mentor-recap-layout">
+                        <div class="mentor-info mentor-info-vertical" style="margin-bottom: 0;">
+                            <div class="mentor-avatar" id="mentorAvatar">MM</div>
+                            <div class="mentor-details">
+                                <div class="mentor-name" id="mentorName">Mentor</div>
+                                <div class="mentor-title" id="mentorTitle">Mentoring Session</div>
+                                <div class="profile-rating" id="mentorRating">☆☆☆☆☆ 0.0 (0 reviews)</div>
+                            </div>
+                        </div>
 
-        <div class="session-summary">
-            <div class="mentor-info">
-                <div class="mentor-avatar">MM</div>
-                <div class="mentor-details">
-                    <div class="mentor-name">Your Mentor</div>
-                    <div class="mentor-title">Mentoring Session</div>
-                    <div class="session-date">
-                        <span>📅 Session date</span>
-                        <span>🕐 Time</span>
-                        <span>⏱️ Duration</span>
-                        <span>💻 Video Call</span>
+                        <div class="stat-card mentor-breakdown-card">
+                            <div class="section-title" style="margin-bottom: 14px;">Rating Breakdown</div>
+
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">5 Stars</div>
+                                <div class="breakdown-bar-container"><div id="mentorBar5" class="breakdown-bar" style="width: 0%;"></div></div>
+                                <div id="mentorVal5" class="breakdown-value">0</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">4 Stars</div>
+                                <div class="breakdown-bar-container"><div id="mentorBar4" class="breakdown-bar" style="width: 0%;"></div></div>
+                                <div id="mentorVal4" class="breakdown-value">0</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">3 Stars</div>
+                                <div class="breakdown-bar-container"><div id="mentorBar3" class="breakdown-bar" style="width: 0%;"></div></div>
+                                <div id="mentorVal3" class="breakdown-value">0</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-label">2 Stars</div>
+                                <div class="breakdown-bar-container"><div id="mentorBar2" class="breakdown-bar" style="width: 0%;"></div></div>
+                                <div id="mentorVal2" class="breakdown-value">0</div>
+                            </div>
+                            <div class="breakdown-item" style="margin-bottom: 0;">
+                                <div class="breakdown-label">1 Star</div>
+                                <div class="breakdown-bar-container"><div id="mentorBar1" class="breakdown-bar" style="width: 0%;"></div></div>
+                                <div id="mentorVal1" class="breakdown-value">0</div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
-            </div>
-            <div class="tips-box" id="topicBox">
-                <div class="tips-title">Session Topic</div>
-                <div id="sessionTopic">Details not provided</div>
-            </div>
-        </div>
+                <div class="review-form">
+                    <div class="section-title">Add Review</div>
 
-        <div class="review-form">
-            <div class="section-title">Rate Your Session</div>
-
-            <div class="tips-box">
-                <div class="tips-title">💡 Tips for Writing a Great Review</div>
-                <div class="tips-list">
-                    • Be specific about what you learned or achieved<br>
-                    • Mention the mentor's strengths and teaching style<br>
-                    • Share how the session helped you with your goals<br>
-                    • Be honest but constructive in your feedback
-                </div>
-            </div>
-
-            <div class="rating-section">
-                <label class="rating-label">Overall Rating</label>
-                <div class="star-rating" id="overallRating">
-                    <span class="star" data-rating="1">★</span>
-                    <span class="star" data-rating="2">★</span>
-                    <span class="star" data-rating="3">★</span>
-                    <span class="star" data-rating="4">★</span>
-                    <span class="star" data-rating="5">★</span>
-                </div>
-                <div class="rating-text" id="ratingText">Click to rate</div>
-            </div>
-
-            <div class="criteria-ratings">
-                <div class="criteria-item">
-                    <label class="criteria-label">Knowledge & Expertise</label>
-                    <div class="mini-stars" data-criteria="knowledge">
-                        <span class="mini-star" data-rating="1">★</span>
-                        <span class="mini-star" data-rating="2">★</span>
-                        <span class="mini-star" data-rating="3">★</span>
-                        <span class="mini-star" data-rating="4">★</span>
-                        <span class="mini-star" data-rating="5">★</span>
+                    <div class="rating-section">
+                        <div class="star-rating" id="overallRating">
+                            <button type="button" class="star" data-rating="1" aria-label="Rate 1 star">★</button>
+                            <button type="button" class="star" data-rating="2" aria-label="Rate 2 stars">★</button>
+                            <button type="button" class="star" data-rating="3" aria-label="Rate 3 stars">★</button>
+                            <button type="button" class="star" data-rating="4" aria-label="Rate 4 stars">★</button>
+                            <button type="button" class="star" data-rating="5" aria-label="Rate 5 stars">★</button>
+                        </div>
+                        <div class="rating-text" id="ratingText">Select a rating</div>
                     </div>
-                </div>
 
-                <div class="criteria-item">
-                    <label class="criteria-label">Communication Skills</label>
-                    <div class="mini-stars" data-criteria="communication">
-                        <span class="mini-star" data-rating="1">★</span>
-                        <span class="mini-star" data-rating="2">★</span>
-                        <span class="mini-star" data-rating="3">★</span>
-                        <span class="mini-star" data-rating="4">★</span>
-                        <span class="mini-star" data-rating="5">★</span>
+                    <div class="form-group">
+                        <label class="form-label" for="reviewText">Comment (optional)</label>
+                        <textarea class="form-textarea" id="reviewText" maxlength="256" placeholder="Write a short comment..."></textarea>
+                        <div class="character-count"><span id="charCount">0</span>/256</div>
                     </div>
-                </div>
 
-                <div class="criteria-item">
-                    <label class="criteria-label">Helpfulness</label>
-                    <div class="mini-stars" data-criteria="helpfulness">
-                        <span class="mini-star" data-rating="1">★</span>
-                        <span class="mini-star" data-rating="2">★</span>
-                        <span class="mini-star" data-rating="3">★</span>
-                        <span class="mini-star" data-rating="4">★</span>
-                        <span class="mini-star" data-rating="5">★</span>
-                    </div>
-                </div>
+                    <button class="submit-btn review-submit" id="submitReview" disabled>Add Review</button>
 
-                <div class="criteria-item">
-                    <label class="criteria-label">Value for Money</label>
-                    <div class="mini-stars" data-criteria="value">
-                        <span class="mini-star" data-rating="1">★</span>
-                        <span class="mini-star" data-rating="2">★</span>
-                        <span class="mini-star" data-rating="3">★</span>
-                        <span class="mini-star" data-rating="4">★</span>
-                        <span class="mini-star" data-rating="5">★</span>
+                    <div class="success-message" id="successMessage">
+                        <div style="font-size: 40px; margin-bottom: 10px;">✅</div>
+                        <h3 style="margin-bottom: 8px;">Review added</h3>
+                        <p>Your feedback has been saved.</p>
                     </div>
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label">Write Your Review *</label>
-                <textarea
-                    class="form-textarea"
-                    id="reviewText"
-                    placeholder="Share your experience with this mentor. What did you learn? How did they help you? What made the session valuable?"
-                    maxlength="1000"
-                ></textarea>
-                <div class="character-count">
-                    <span id="charCount">0</span>/1000 characters
+            <div class="review-right-column">
+                <div class="filters-section mentor-review-filters" id="mentorReviewFilters" style="margin-bottom: 10px;">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="5">5 Stars</button>
+                    <button class="filter-btn" data-filter="4">4 Stars</button>
+                    <button class="filter-btn" data-filter="3">3 Stars</button>
+                    <button class="filter-btn" data-filter="2">2 Stars</button>
+                    <button class="filter-btn" data-filter="1">1 Star</button>
                 </div>
-            </div>
 
-            <div class="tags-section">
-                <label class="tags-label">What best describes this mentor? (Select all that apply)</label>
-                <div class="tags-grid">
-                    <div class="tag-chip">Knowledgeable</div>
-                    <div class="tag-chip">Patient</div>
-                    <div class="tag-chip">Clear Communicator</div>
-                    <div class="tag-chip">Motivating</div>
-                    <div class="tag-chip">Practical</div>
-                    <div class="tag-chip">Responsive</div>
-                    <div class="tag-chip">Professional</div>
-                    <div class="tag-chip">Friendly</div>
-                    <div class="tag-chip">Insightful</div>
-                    <div class="tag-chip">Well Prepared</div>
+                <div class="reviews-list" id="existingReviewsSection">
+                    <div class="section-title" style="margin-bottom: 20px;">View Reviews</div>
+                    <div class="stat-card" id="mentorReviewsList"></div>
+                    <div class="empty-state" id="mentorReviewsEmpty" style="display:none;">
+                        <div class="empty-icon">⭐</div>
+                        <div>No reviews yet</div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="checkbox-section">
-                <label class="checkbox-item">
-                    <input type="checkbox" id="recommend" />
-                    <label for="recommend">I would recommend this mentor to others</label>
-                </label>
-                <label class="checkbox-item">
-                    <input type="checkbox" id="bookAgain" />
-                    <label for="bookAgain">I would book another session with this mentor</label>
-                </label>
-                <label class="checkbox-item">
-                    <input type="checkbox" id="publicReview" checked />
-                    <label for="publicReview">Make this review public (visible to other users)</label>
-                </label>
-            </div>
-
-            <button class="submit-btn review-submit" id="submitReview">Submit Review</button>
-
-            <div class="privacy-note">
-                Your review will be visible to the mentor and other users (if public is selected).
-                Reviews help improve the quality of mentorship on our platform.
-            </div>
-
-            <div class="success-message" id="successMessage">
-                <div style="font-size: 48px; margin-bottom: 15px;">✅</div>
-                <h3 style="margin-bottom: 10px;">Thank you for your review!</h3>
-                <p>Your feedback helps us maintain quality mentorship.</p>
             </div>
         </div>
     </div>
 
+    <script src="../js/utils.js"></script>
     <script src="../js/reviewsMentee.js"></script>
 </body>
 </html>

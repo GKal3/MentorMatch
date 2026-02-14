@@ -26,11 +26,11 @@
 
                     <div class="payment-tabs">
                         <div class="payment-tab active" id="cardTab">
-                            <span class="payment-icon">💳</span>
+                            <span style="font-size: 24px; margin-top: -7px;">💳</span>
                             <span>Credit Card</span>
                         </div>
                         <div class="payment-tab" id="paypalTab">
-                            <span class="payment-icon">🅿️</span>
+                            <img src="../assets/paypal_logo.png" class="payment-icon" alt="PayPal">
                             <span>PayPal</span>
                         </div>
                     </div>
@@ -87,7 +87,7 @@
                                 <input type="text" class="form-input" placeholder="12345" />
                             </div>
                         </div>
-
+                        <button class="submit-payment-btn" id="submitPayment">Complete Payment</button>
                         <div class="security-info">
                             <span>🔒</span>
                             <span>Your payment information is encrypted and secure</span>
@@ -95,15 +95,14 @@
                     </div>
 
                     <div id="paypalSection" class="paypal-section">
-                        <div style="font-size: 60px; margin-bottom: 20px;">🅿️</div>
-                        <h3 style="margin-bottom: 15px;">Pay with PayPal</h3>
+                        <img src="../assets/paypal_logo_complete.png" class="payment-icon2" alt="PayPal">
                         <p style="color: #666; margin-bottom: 25px;">
                             You will be redirected to PayPal to complete your payment securely.
                         </p>
                         <button class="paypal-btn">Continue to PayPal</button>
-                        <div class="security-info" style="margin-top: 20px;">
+                        <div class="security-info">
                             <span>🔒</span>
-                            <span>Secure payment powered by PayPal</span>
+                            <span >Secure payment powered by PayPal</span>
                         </div>
                     </div>
                 </div>
@@ -122,33 +121,22 @@
                         </div>
                     </div>
 
-                    <div class="summary-item">
+                    <div class="summary-item" id="summarySessionPriceRow">
                         <span>Session Price</span>
-                        <span>€75.00</span>
+                        <span id="summarySessionPrice">€75.00</span>
                     </div>
 
-                    <div class="summary-item">
-                        <span>Platform Fee</span>
-                        <span>€5.00</span>
-                    </div>
-
-                    <div class="summary-item">
-                        <span>Tax (VAT 22%)</span>
-                        <span>€17.60</span>
+                    <div class="summary-item" id="summaryPlatformFeeRow">
+                        <span>Platform Fee (included)</span>
+                        <span id="summaryPlatformFee">€0.00</span>
                     </div>
 
                     <div class="summary-total">
                         <div style="display: flex; justify-content: space-between;">
                             <span>Total</span>
-                            <span>€97.60</span>
+                            <span id="summaryTotal">€75.00</span>
                         </div>
                     </div>
-
-                    <button class="submit-payment-btn" id="submitPayment">Complete Payment</button>
-
-                    <p style="font-size: 12px; color: #666; margin-top: 15px; text-align: center;">
-                        By completing this purchase you agree to our <a href="#" style="color: var(--green);">Terms of Service</a>
-                    </p>
                 </div>
             </div>
         </div>

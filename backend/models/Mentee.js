@@ -19,7 +19,7 @@ class Mentee {
   // Trova mentee per ID utente
   static async findByUserId(userId) {
     const query = `
-      SELECT m.*, u."Mail", u."Nome", u."Cognome"
+      SELECT m.*, u."Mail", u."Nome", u."Cognome", TO_CHAR(u."Data_Nascita", 'YYYY-MM-DD') AS "Data_Nascita", u."Genere"
       FROM "Mentee" m
       JOIN "Utenti" u ON m."Id_Utente" = u."Id"
       WHERE m."Id_Utente" = $1
@@ -33,7 +33,7 @@ class Mentee {
     const query = `
       SELECT 
         COUNT(DISTINCT p."Id") AS totale_prenotazioni,
-        COUNT(DISTINCT CASE WHEN p."Stato" = 'Accettato' THEN p."Id" END) AS prenotazioni_confermate,
+        COUNT(DISTINCT CASE WHEN p."Stato" = 'Accepted' THEN p."Id" END) AS prenotazioni_confermate,
         COUNT(DISTINCT r."Id") AS recensioni_lasciate,
         COALESCE(SUM(pag."Importo"), 0) AS totale_speso
       FROM "Mentee" m

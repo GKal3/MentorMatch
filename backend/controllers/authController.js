@@ -6,9 +6,9 @@ import EmailService from '../utils/emailService.js';
 
 const normalizzaGenere = (val) => {
   if (!val) return val;
-  if (val === 'M') return 'Uomo';
-  if (val === 'F') return 'Donna';
-  if (val === 'Altro') return 'Preferisco non specificare';
+  if (val === 'M') return 'Male';
+  if (val === 'F') return 'Female';
+  if (val === 'Altro') return 'Prefer not to say';
   return val;
 };
 
@@ -24,7 +24,7 @@ export const Accesso = async (req, res) => {
       if (!user) {
         return res.status(401).json({
           success: false,
-          message: 'Credenziali non valide',
+          message: 'Invalid credentials',
         });
       }
 
@@ -34,7 +34,7 @@ export const Accesso = async (req, res) => {
       if (!isPasswordValid) {
         return res.status(401).json({
           success: false,
-          message: 'Credenziali non valide',
+          message: 'Invalid credentials',
         });
       }
 
@@ -48,7 +48,7 @@ export const Accesso = async (req, res) => {
 
       res.json({
         success: true,
-        message: 'Login effettuato con successo',
+        message: 'Login successful',
         token,
         user: {
           id: user.Id,
@@ -63,7 +63,7 @@ export const Accesso = async (req, res) => {
       console.error('Errore login:', error);
       res.status(500).json({
         success: false,
-        message: 'Errore durante il login',
+        message: 'Error during login',
       });
     }
 };
@@ -82,6 +82,8 @@ export const RegMentor = async (req, res) => {
         organizzazione,
         esperienza,
         prezzo,
+        iban,
+        accetta_commissione_piattaforma,
         settore,
         lingua,
         bio
@@ -89,15 +91,24 @@ export const RegMentor = async (req, res) => {
 
       const cvPath = req.file ? `/uploads/cv/${req.file.filename}` : null;
       if (!cvPath) {
-        return res.status(400).json({ success: false, message: 'CV obbligatorio. Carica un file CV (PDF/DOC).' });
+        return res.status(400).json({ success: false, message: 'Resume is required. Please upload a CV (PDF/DOC).' });
       }
 
       const parsedPrice = prezzo === undefined || prezzo === null || prezzo === '' ? 0 : Number(prezzo);
+      const normalizedIban = typeof iban === 'string' ? iban.replace(/\s+/g, '').toUpperCase() : null;
       const genereDB = normalizzaGenere(genere);
+
+      if (parsedPrice > 0 && !normalizedIban) {
+        return res.status(400).json({ success: false, message: 'IBAN is required for paid sessions' });
+      }
+
+      if (parsedPrice > 0 && accetta_commissione_piattaforma !== true && accetta_commissione_piattaforma !== 'true') {
+        return res.status(400).json({ success: false, message: 'You must accept platform fee to set a paid price' });
+      }
 
       const existingUser = await User.getByEmail(mail);
       if (existingUser) {
-        return res.status(400).json({ success: false, message: 'Email già registrata' });
+        return res.status(400).json({ success: false, message: 'Email already registered' });
       }
 
       const user = await User.create({
@@ -119,16 +130,20 @@ export const RegMentor = async (req, res) => {
         Number.isFinite(parsedPrice) ? parsedPrice : 0,
         settore,
         lingua,
-        bio
+        bio,
+        normalizedIban
       );
 
-      await EmailService.inviaEmailBenvenuto(mail, nome, 'Mentor');
+      const mentorWelcome = await EmailService.inviaEmailBenvenuto(mail, nome, 'Mentor');
+      if (!mentorWelcome?.success) {
+        console.warn('Welcome email failed:', mentorWelcome?.error);
+      }
 
       const token = GeneraJWT({ id: user.Id, mail: user.Mail, ruolo: user.Ruolo });
 
       res.status(201).json({
         success: true,
-        message: 'Registrazione mentor completata',
+        message: 'Mentor registration completed',
         token,
         user: {
           id: user.Id,
@@ -142,7 +157,7 @@ export const RegMentor = async (req, res) => {
 
     } catch (error) {
       console.error('Errore registrazione mentor:', error);
-      res.status(500).json({ success: false, message: 'Errore durante la registrazione mentor' });
+      res.status(500).json({ success: false, message: 'Error during mentor registration' });
     }
 };
 
@@ -153,7 +168,7 @@ export const RegMentee = async (req, res) => {
 
       const existingUser = await User.getByEmail(mail);
       if (existingUser) {
-        return res.status(400).json({ success: false, message: 'Email già registrata' });
+        return res.status(400).json({ success: false, message: 'Email already registered' });
       }
 
       const genereDB = normalizzaGenere(genere);
@@ -169,13 +184,16 @@ export const RegMentee = async (req, res) => {
 
       const mentee = await Mentee.create({ id_utente: user.Id, occupazione, bio: bio || null });
 
-      await EmailService.inviaEmailBenvenuto(mail, nome, 'Mentee');
+      const menteeWelcome = await EmailService.inviaEmailBenvenuto(mail, nome, 'Mentee');
+      if (!menteeWelcome?.success) {
+        console.warn('Welcome email failed:', menteeWelcome?.error);
+      }
 
       const token = GeneraJWT({ id: user.Id, mail: user.Mail, ruolo: user.Ruolo });
 
       res.status(201).json({
         success: true,
-        message: 'Registrazione mentee completata',
+        message: 'Mentee registration completed',
         token,
         user: {
           id: user.Id,
@@ -189,7 +207,7 @@ export const RegMentee = async (req, res) => {
 
     } catch (error) {
       console.error('Errore registrazione mentee:', error);
-      res.status(500).json({ success: false, message: 'Errore durante la registrazione mentee' });
+      res.status(500).json({ success: false, message: 'Error during mentee registration' });
     }
 };
 
@@ -197,6 +215,6 @@ export const RegMentee = async (req, res) => {
 export const Discon = async (req, res) => {
   res.json({
     success: true,
-    message: 'Logout effettuato con successo',
+    message: 'Logout successful',
   });
 };

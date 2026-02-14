@@ -26,7 +26,7 @@ async function handleLogin(e) {
     
     // Validazione base
     if (!email || !password) {
-        alert('Inserisci email e password');
+        alert('Enter email and password');
         return;
     }
     
@@ -71,11 +71,11 @@ async function handleLogin(e) {
                 window.location.href = '/pages/index.html';
             }
         } else {
-            alert('Errore: ' + result.message);
+            alert('Error: ' + result.message);
         }
         
     } catch (error) {
-        console.error('Errore nel login:', error);
-        alert('Errore nel login: ' + error.message);
+        console.error('Login error:', error);
+        alert('Login error: ' + error.message);
     }
 }

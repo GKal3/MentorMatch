@@ -1,5 +1,11 @@
 import pool from "../config/database.js";
 
+const normalizeIban = (iban) => {
+    if (typeof iban !== 'string') return null;
+    const cleaned = iban.replace(/\s+/g, '').toUpperCase();
+    return cleaned || null;
+};
+
 class Mentor {
     static async getAll() {
         const result = await pool.query(
@@ -19,20 +25,21 @@ class Mentor {
                 m."Organizzazione",
                 m."Esperienza",
                 m."Prezzo", 
+                m."IBAN",
                 m."Settore", 
                 m."Lingua", 
                 m."Bio",
                 u."Nome", 
                 u."Cognome", 
                 u."Mail", 
-                u."Data_Nascita",
+                TO_CHAR(u."Data_Nascita", 'YYYY-MM-DD') AS "Data_Nascita",
                 COALESCE(AVG(r."Voto"), 0) as media_recensioni,
                 COUNT(DISTINCT r."Id") as numero_recensioni
             FROM "Mentor" m 
             JOIN "Utenti" u ON m."Id_Utente" = u."Id" 
             LEFT JOIN "Recensioni" r ON m."Id_Utente" = r."Id_Mentor"
             WHERE m."Id_Utente" = $1
-            GROUP BY m."Id", m."Id_Utente", m."Cv_Url", m."Titolo", m."Organizzazione", m."Esperienza", m."Prezzo", m."Settore", m."Lingua", m."Bio", u."Nome", u."Cognome", u."Mail", u."Data_Nascita"`,
+            GROUP BY m."Id", m."Id_Utente", m."Cv_Url", m."Titolo", m."Organizzazione", m."Esperienza", m."Prezzo", m."IBAN", m."Settore", m."Lingua", m."Bio", u."Nome", u."Cognome", u."Mail", u."Data_Nascita"`,
             [id]
         );
         console.log('Query result rows:', result.rows.length);
@@ -40,18 +47,47 @@ class Mentor {
         return result.rows[0];
     }
 
-    static async create(idUtente, titolo, organizzazione, esperienza, cvUrl, prezzo, settore, lingua, bio) {
+    static async getPersonalById(id) {
         const result = await pool.query(
-            'INSERT INTO "Mentor" ("Id_Utente", "Titolo", "Organizzazione", "Esperienza", "Cv_Url", "Prezzo", "Settore", "Lingua", "Bio") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-            [idUtente, titolo, organizzazione, esperienza, cvUrl, prezzo, settore, lingua, bio]
+            `SELECT 
+                m."Id",
+                m."Id_Utente", 
+                m."Cv_Url",
+                m."Titolo",
+                m."Organizzazione",
+                m."Esperienza",
+                m."Prezzo", 
+                m."IBAN",
+                m."Settore", 
+                m."Lingua", 
+                m."Bio",
+                u."Nome", 
+                u."Cognome", 
+                u."Mail", 
+                TO_CHAR(u."Data_Nascita", 'YYYY-MM-DD') AS "Data_Nascita",
+                u."Genere"
+            FROM "Mentor" m 
+            JOIN "Utenti" u ON m."Id_Utente" = u."Id" 
+            WHERE m."Id_Utente" = $1`,
+            [id]
         );
         return result.rows[0];
     }
 
-    static async update(idUtente, titolo, organizzazione, esperienza, prezzo, settore, lingua, bio) {
+    static async create(idUtente, titolo, organizzazione, esperienza, cvUrl, prezzo, settore, lingua, bio, iban = null) {
+        const normalizedIban = normalizeIban(iban);
         const result = await pool.query(
-            'UPDATE "Mentor" SET "Titolo" = COALESCE($1, "Titolo"), "Organizzazione" = COALESCE($2, "Organizzazione"), "Esperienza" = COALESCE($3, "Esperienza"), "Prezzo" = COALESCE($4, "Prezzo"), "Settore" = COALESCE($5, "Settore"), "Lingua" = COALESCE($6, "Lingua"), "Bio" = COALESCE($7, "Bio") WHERE "Id_Utente" = $8 RETURNING *',
-            [titolo, organizzazione, esperienza, prezzo, settore, lingua, bio, idUtente]
+            'INSERT INTO "Mentor" ("Id_Utente", "Titolo", "Organizzazione", "Esperienza", "Cv_Url", "Prezzo", "Settore", "Lingua", "Bio", "IBAN") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+            [idUtente, titolo, organizzazione, esperienza, cvUrl, prezzo, settore, lingua, bio, normalizedIban]
+        );
+        return result.rows[0];
+    }
+
+    static async update(idUtente, titolo, organizzazione, esperienza, prezzo, settore, lingua, bio, iban = null) {
+        const normalizedIban = normalizeIban(iban);
+        const result = await pool.query(
+            'UPDATE "Mentor" SET "Titolo" = COALESCE($1, "Titolo"), "Organizzazione" = COALESCE($2, "Organizzazione"), "Esperienza" = COALESCE($3, "Esperienza"), "Prezzo" = COALESCE($4, "Prezzo"), "Settore" = COALESCE($5, "Settore"), "Lingua" = COALESCE($6, "Lingua"), "Bio" = COALESCE($7, "Bio"), "IBAN" = COALESCE($8, "IBAN") WHERE "Id_Utente" = $9 RETURNING *',
+            [titolo, organizzazione, esperienza, prezzo, settore, lingua, bio, normalizedIban, idUtente]
         );
         return result.rows[0];
     }
@@ -71,16 +107,32 @@ class Mentor {
                 m."Organizzazione",
                 m."Esperienza",
                 m."Prezzo", 
+                m."IBAN",
                 m."Settore", 
                 m."Lingua", 
                 m."Bio",
                 u."Nome",
                 u."Cognome",
-                COALESCE(AVG(r."Voto"), 0) as media_recensioni,
-                COUNT(DISTINCT r."Id") as numero_recensioni
+                COALESCE(rv.media_recensioni, 0) as media_recensioni,
+                COALESCE(rv.numero_recensioni, 0) as numero_recensioni,
+                COALESCE(av.giorni_disponibili, ARRAY[]::int[]) as giorni_disponibili
             FROM "Mentor" m
             JOIN "Utenti" u ON m."Id_Utente" = u."Id"
-            LEFT JOIN "Recensioni" r ON m."Id_Utente" = r."Id_Mentor"
+            LEFT JOIN (
+                SELECT 
+                    "Id_Mentor",
+                    AVG("Voto") AS media_recensioni,
+                    COUNT("Id") AS numero_recensioni
+                FROM "Recensioni"
+                GROUP BY "Id_Mentor"
+            ) rv ON m."Id_Utente" = rv."Id_Mentor"
+            LEFT JOIN (
+                SELECT 
+                    "Id_Utente",
+                    ARRAY_AGG(DISTINCT "Giorno") AS giorni_disponibili
+                FROM "Disponibilita"
+                GROUP BY "Id_Utente"
+            ) av ON m."Id_Utente" = av."Id_Utente"
             WHERE 1=1
         `;
 
@@ -111,9 +163,34 @@ class Mentor {
             paramCount++;
         }
 
+        if (filters.rating_min) {
+            query += ` AND COALESCE(rv.media_recensioni, 0) >= $${paramCount}`;
+            values.push(Number(filters.rating_min));
+            paramCount++;
+        }
+
+        if (filters.disponibilita) {
+            const selectedDays = String(filters.disponibilita)
+                .split(',')
+                .map((day) => Number(day.trim()))
+                .filter((day) => Number.isInteger(day) && day >= 1 && day <= 7);
+
+            if (selectedDays.length > 0) {
+                query += `
+                    AND EXISTS (
+                        SELECT 1
+                        FROM "Disponibilita" d
+                        WHERE d."Id_Utente" = m."Id_Utente"
+                          AND d."Giorno" = ANY($${paramCount}::int[])
+                    )
+                `;
+                values.push(selectedDays);
+                paramCount++;
+            }
+        }
+
         query += `
-            GROUP BY m."Id", m."Id_Utente", m."Cv_Url", m."Titolo", m."Organizzazione", m."Esperienza", m."Prezzo", m."Settore", m."Lingua", m."Bio", u."Nome", u."Cognome"
-            ORDER BY media_recensioni DESC, numero_recensioni DESC
+            ORDER BY COALESCE(rv.media_recensioni, 0) DESC, COALESCE(rv.numero_recensioni, 0) DESC
         `;
 
         const result = await pool.query(query, values);

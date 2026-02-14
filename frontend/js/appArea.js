@@ -36,7 +36,7 @@ async function loadAppointments() {
     const appointments = data.data || [];
     renderAppointments(appointments);
   } catch (err) {
-    console.error('Errore caricamento appuntamenti:', err);
+    console.error('Error loading appointments:', err);
     showEmpty('upcoming');
     showEmpty('past');
     showEmpty('cancelled');
@@ -49,21 +49,29 @@ function renderAppointments(list) {
 
   list.forEach(item => {
     const statusRaw = (item.Stato || '').toLowerCase();
-    const dateStr = item.Giorno ? `${item.Giorno}T${item.Ora || '00:00'}` : null;
-    const start = dateStr ? new Date(dateStr) : null;
+    const sessionDay = getAppointmentDayDate(item);
 
-    const isCancelled = statusRaw.includes('annullato') || statusRaw.includes('rifiutato');
+    const isCancelled = statusRaw.includes('cancel');
     if (isCancelled) {
       categorized.cancelled.push(item);
       return;
     }
 
-    if (start && start < now) {
+    const sessionEnd = getAppointmentEndDate(item);
+    const isPastByDateTime = sessionEnd
+      ? sessionEnd < now
+      : (sessionDay ? sessionDay < new Date(now.getFullYear(), now.getMonth(), now.getDate()) : false);
+
+    if (isPastByDateTime) {
       categorized.past.push(item);
     } else {
       categorized.upcoming.push(item);
     }
   });
+
+  categorized.upcoming.sort(compareByStartAsc);
+  categorized.past.sort(compareByStartDesc);
+  categorized.cancelled.sort(compareByStartAsc);
 
   updateSection('upcoming', categorized.upcoming);
   updateSection('past', categorized.past);
@@ -95,9 +103,13 @@ function updateSection(key, items) {
     const price = Number(app.Prezzo || 0);
     const duration = app.Durata || 60;
     const dateLabel = formatDate(app.Giorno);
-    const timeLabel = app.Ora ? app.Ora : '';
+    const startTime = app.Ora_Inizio || app.Ora || '';
+    const endTime = app.Ora_Fine || '';
+    const timeLabel = startTime && endTime ? `${startTime} - ${endTime}` : startTime;
 
-    const statusInfo = mapStatus(app.Stato);
+    const statusInfo = mapStatusForSection(app.Stato, key);
+    const showStatus = key !== 'past';
+    const meetingLink = getMeetingLink(app);
 
     const card = document.createElement('div');
     card.className = 'session-card';
@@ -112,15 +124,16 @@ function updateSection(key, items) {
             <span>🕐 ${timeLabel}</span>
           </div>
         </div>
-        <span class="session-status ${statusInfo.className}">${statusInfo.label}</span>
+        ${showStatus ? `<span class="session-status ${statusInfo.className}">${statusInfo.label}</span>` : ''}
       </div>
       <div class="session-details">
         <div class="detail-item"><span class="detail-icon">⏱️</span><span>Duration: ${duration} min</span></div>
-        <div class="detail-item"><span class="detail-icon">💻</span><span>Video Call</span></div>
+        <div class="detail-item"><span class="detail-icon">💻</span><span>${meetingLink ? 'Google Meet ready' : 'Video Call (pending)'}</span></div>
         <div class="detail-item"><span class="detail-icon">💰</span><span>€${price.toFixed(2)}</span></div>
+        <div class="detail-item"><span class="detail-icon">🔗</span><span>${meetingLink ? `<a href="${meetingLink}" target="_blank" rel="noopener noreferrer">Open link</a>` : 'Not available yet'}</span></div>
       </div>
       <div class="session-actions">
-        ${actionButtons(app)}
+        ${actionButtons(app, key)}
       </div>
     `;
 
@@ -139,20 +152,26 @@ function formatDate(iso) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-function mapStatus(stato) {
+function mapStatusForSection(stato, sectionKey) {
   const s = (stato || '').toLowerCase();
-  if (s.includes('accettato') || s.includes('conferm')) return { label: 'Confirmed', className: 'status-confirmed' };
-  if (s.includes('attesa') || s.includes('upcoming')) return { label: 'Upcoming', className: 'status-upcoming' };
-  if (s.includes('annullato') || s.includes('rifiutato') || s.includes('cancel')) return { label: 'Cancelled', className: 'status-cancelled' };
+  if (sectionKey === 'upcoming') {
+    if (s.includes('accepted') || s.includes('conferm')) {
+      return { label: 'Confirmed', className: 'status-confirmed' };
+    }
+    return { label: 'Waiting list', className: 'status-upcoming' };
+  }
+  if (s.includes('cancel')) return { label: 'Cancelled', className: 'status-cancelled' };
   if (s.includes('completato')) return { label: 'Completed', className: 'status-completed' };
   return { label: 'Scheduled', className: 'status-upcoming' };
 }
 
-function actionButtons(app) {
+function actionButtons(app, sectionKey) {
   const idMentor = app.Id_Mentor || app.id_mentor;
   const mentorUserId = idMentor;
   const mentorName = app.mentor_nome || '';
   const mentorCognome = app.mentor_cognome || '';
+  const isAccepted = isAcceptedStatus(app?.Stato);
+  const meetingLink = getMeetingLink(app);
   
   // Costruisci URL chat con parametri
   const chatParams = new URLSearchParams({
@@ -162,22 +181,23 @@ function actionButtons(app) {
   });
   const chatLink = `/pages/chat.html?${chatParams.toString()}`;
 
-  const dateStr = app.Giorno ? `${app.Giorno}T${app.Ora || '00:00'}` : null;
-  const start = dateStr ? new Date(dateStr) : null;
-  const isPast = start ? start < new Date() : false;
-  const isCancelled = ((app.Stato || '').toLowerCase().includes('annullato') || (app.Stato || '').toLowerCase().includes('rifiutato'));
+  if (sectionKey === 'upcoming') {
+    const joinDisabled = !isAccepted || !meetingLink;
+    const joinAction = meetingLink ? `onclick="window.open('${encodeURI(meetingLink)}','_blank','noopener,noreferrer')"` : '';
+    return `
+      <button class="action-btn btn-secondary" ${joinAction} ${joinDisabled ? 'disabled title="Available when booking is accepted and link is generated"' : ''}>Join Session</button>
+      <button class="action-btn btn-secondary" onclick="window.location.href='${chatLink}'">Message</button>
+      <button class="action-btn btn-danger" onclick="cancelSession(${app.Id})">Cancel</button>
+    `;
+  }
 
-  const reviewBtn = (!isCancelled && isPast && mentorUserId) ? `<button class="action-btn btn-primary" onclick="window.location.href='${buildReviewUrl(app)}'">Add Review</button>` : '';
-  
-  const cancelBtn = (!isCancelled && !isPast) ? `<button class="action-btn btn-danger" onclick="cancelSession(${app.Id})">Cancel</button>` : '';
+  if (sectionKey === 'past') {
+    return mentorUserId
+      ? `<button class="action-btn btn-secondary" onclick="window.location.href='${buildReviewUrl(app)}'">Add Review</button>`
+      : '';
+  }
 
-  return `
-    <button class="action-btn btn-primary">Join Session</button>
-    <button class="action-btn btn-secondary" onclick="window.location.href='${chatLink}'">Message</button>
-    ${reviewBtn}
-    <button class="action-btn btn-secondary" disabled>Reschedule</button>
-    ${cancelBtn}
-  `;
+  return `<button class="action-btn btn-secondary" onclick="window.location.href='${chatLink}'">Message</button>`;
 }
 
 function buildReviewUrl(app) {
@@ -187,7 +207,7 @@ function buildReviewUrl(app) {
     mentorName,
     settore: app.Settore || '',
     date: app.Giorno || '',
-    time: app.Ora || '',
+    time: app.Ora_Inizio || app.Ora || '',
     duration: String(app.Durata || ''),
     topic: app.Note || ''
   });
@@ -227,4 +247,115 @@ async function cancelSession(appointmentId) {
     console.error('Error cancelling session:', err);
     alert('Error cancelling session: ' + err.message);
   }
+}
+
+function getAppointmentStartDate(appointment) {
+  const rawDay = appointment?.Giorno;
+  const rawStartTime = appointment?.Ora_Inizio || appointment?.Ora || '00:00';
+
+  if (!rawDay) return null;
+
+  const day = normalizeDayToISO(rawDay);
+  if (!day) return null;
+
+  const time = normalizeTimeToHHMMSS(rawStartTime);
+  const isoDateTime = `${day}T${time}`;
+  const parsed = new Date(isoDateTime);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function getAppointmentEndDate(appointment) {
+  const rawDay = appointment?.Giorno;
+  if (!rawDay) return null;
+
+  const day = normalizeDayToISO(rawDay);
+  if (!day) return null;
+
+  const endTimeRaw = appointment?.Ora_Fine;
+  const startTimeRaw = appointment?.Ora_Inizio || appointment?.Ora || '00:00';
+  const durationMinutes = Number(appointment?.Durata || appointment?.durata || 60);
+
+  const endTime = endTimeRaw
+    ? normalizeTimeToHHMMSS(endTimeRaw)
+    : addMinutesToTime(
+      String(startTimeRaw).slice(0, 5),
+      Number.isFinite(durationMinutes) && durationMinutes > 0 ? durationMinutes : 60
+    ) + ':00';
+
+  const isoDateTime = `${day}T${endTime}`;
+  const parsed = new Date(isoDateTime);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function getAppointmentDayDate(appointment) {
+  const rawDay = appointment?.Giorno;
+  const day = normalizeDayToISO(rawDay);
+  if (!day) return null;
+
+  const parsed = new Date(`${day}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return null;
+  parsed.setHours(0, 0, 0, 0);
+  return parsed;
+}
+
+function normalizeDayToISO(rawDay) {
+  if (!rawDay) return null;
+
+  if (rawDay instanceof Date) {
+    if (Number.isNaN(rawDay.getTime())) return null;
+    return `${rawDay.getFullYear()}-${String(rawDay.getMonth() + 1).padStart(2, '0')}-${String(rawDay.getDate()).padStart(2, '0')}`;
+  }
+
+  const str = String(rawDay).trim();
+  if (!str) return null;
+
+  const parsed = new Date(str);
+  if (!Number.isNaN(parsed.getTime())) {
+    return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, '0')}-${String(parsed.getDate()).padStart(2, '0')}`;
+  }
+
+  const match = str.match(/^(\d{4}-\d{2}-\d{2})/);
+  return match ? match[1] : null;
+}
+
+function normalizeTimeToHHMMSS(rawTime) {
+  const str = String(rawTime || '').trim();
+  const match = str.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?/);
+  if (!match) return '00:00:00';
+
+  const hh = String(Math.min(23, Number(match[1]))).padStart(2, '0');
+  const mm = String(Math.min(59, Number(match[2]))).padStart(2, '0');
+  const ss = String(Math.min(59, Number(match[3] || 0))).padStart(2, '0');
+  return `${hh}:${mm}:${ss}`;
+}
+
+function isAcceptedStatus(stato) {
+  const s = String(stato || '').toLowerCase();
+  return s.includes('accepted') || s.includes('conferm');
+}
+
+function getAppointmentStartTimestamp(appointment) {
+  const rawDay = appointment?.Giorno || appointment?.giorno;
+  const rawStart = appointment?.Ora_Inizio || appointment?.Ora || appointment?.ora || '00:00';
+  if (!rawDay) return Number.MAX_SAFE_INTEGER;
+
+  const dateIso = String(rawDay).slice(0, 10);
+  const timeMatch = String(rawStart).match(/^(\d{1,2}):(\d{2})/);
+  const hh = timeMatch ? String(Math.min(23, Number(timeMatch[1]))).padStart(2, '0') : '00';
+  const mm = timeMatch ? String(Math.min(59, Number(timeMatch[2]))).padStart(2, '0') : '00';
+  const parsed = new Date(`${dateIso}T${hh}:${mm}:00`);
+
+  return Number.isNaN(parsed.getTime()) ? Number.MAX_SAFE_INTEGER : parsed.getTime();
+}
+
+function compareByStartAsc(a, b) {
+  return getAppointmentStartTimestamp(a) - getAppointmentStartTimestamp(b);
+}
+
+function compareByStartDesc(a, b) {
+  return getAppointmentStartTimestamp(b) - getAppointmentStartTimestamp(a);
+}
+
+function getMeetingLink(appointment) {
+  return appointment?.Link || appointment?.link || appointment?.meeting_link || '';
 }

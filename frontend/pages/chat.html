@@ -10,16 +10,22 @@
     <header>
         <img class="logo" alt="Logo" src="../assets/Logo.svg" />
         <nav>
-            <a href="javascript:void(0)" id="dashboard-link">DASHBOARD</a>
+            <a href="index.html">HOME</a>
             <a href="/pages/notification.html">NOTIFICATIONS</a>
             <a href="#">LOGOUT</a>
         </nav>
     </header>
 
-    <div class="messages-container">
+    <div class="sidebar" id="role-sidebar"></div>
+
+    <div class="messages-container messages-with-sidebar">
+        <div class="welcome-section messages-title-section">
+            <h1>Messages</h1>
+        </div>
+
         <div class="chat-layout">
             <div class="conversations-list">
-                <div class="conversations-header">Messages</div>
+                <div class="conversations-header">Open Conversations</div>
                 <div id="conversations-container"></div>
             </div>
 
@@ -28,7 +34,6 @@
                     <div class="chat-header-avatar" id="header-avatar"></div>
                     <div class="chat-header-info">
                         <div class="chat-header-name" id="header-name"></div>
-                        <div class="chat-header-status">Online</div>
                     </div>
                 </div>
 

@@ -1,6 +1,6 @@
 import Message from '../models/Message.js';
-import Notification from '../models/Notification.js';
 import User from '../models/User.js';
+import NotificationService from '../utils/notificationService.js';
 
 // Invia un messaggio
 export const sendMessage = async (req, res) => {
@@ -12,15 +12,10 @@ export const sendMessage = async (req, res) => {
         
         // Recupera informazioni del mittente per la notifica
         const sender = await User.getById(senderId);
-        const senderName = sender ? `${sender.Nome} ${sender.Cognome}` : 'Utente';
+        const senderName = sender ? `${sender.Nome} ${sender.Cognome}` : 'User';
         
         // Crea notifica per il destinatario
-        await Notification.create(
-            receiverId,
-            'Nuovo Messaggio',
-            'Nuovo Messaggio',
-            `${senderName} ti ha inviato un messaggio`
-        );
+        await NotificationService.notifyNewMessage(receiverId, senderName);
         
         res.status(201).json(newMessage);
     } catch (error) {

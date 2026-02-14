@@ -19,139 +19,94 @@
     <div class="payment-success-container">
         <div class="success-card">
             <div class="success-icon">✅</div>
-            <h1>Pagamento Completato!</h1>
-            <p>La tua sessione è stata prenotata con successo.</p>
-            
-            <div class="success-details" id="successDetails">
-                <!-- Caricato dinamicamente -->
-            </div>
+            <h1>Payment Completed!</h1>
+            <p>Your session has been booked successfully.</p>
 
-            <button class="submit-payment-btn" onclick="goToDashboard()">Torna alla Dashboard</button>
+            <button class="submit-payment-btn" onclick="goToDashboard()">Back to Dashboard</button>
         </div>
     </div>
 
-    <style>
-        .payment-success-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: calc(100vh - 100px);
-            padding: 40px 20px;
-        }
 
-        .success-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            max-width: 500px;
-            animation: slideUp 0.6s ease-out;
-        }
-
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .success-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: bounceIn 0.8s ease-out;
-        }
-
-        @keyframes bounceIn {
-            0% {
-                transform: scale(0);
-            }
-            50% {
-                transform: scale(1.1);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        .success-card h1 {
-            color: var(--green);
-            font-size: 32px;
-            margin-bottom: 15px;
-        }
-
-        .success-card p {
-            color: #666;
-            font-size: 16px;
-            margin-bottom: 30px;
-        }
-
-        .success-details {
-            background: #f5f5f5;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
-            text-align: left;
-        }
-
-        .success-details div {
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #333;
-        }
-
-        .success-details strong {
-            color: var(--green);
-        }
-
-        .submit-payment-btn {
-            background: var(--green);
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 16px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .submit-payment-btn:hover {
-            background: #6b9691;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(132, 165, 157, 0.3);
-        }
-    </style>
-
+    <script src="../js/utils.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const urlParams = new URLSearchParams(window.location.search);
-            const paymentId = urlParams.get('paymentId');
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🔵 Payment Success Page Loaded');
 
-            if (paymentId) {
-                const detailsDiv = document.getElementById('successDetails');
-                detailsDiv.innerHTML = `
-                    <div><strong>ID Pagamento:</strong> ${paymentId}</div>
-                    <div><strong>Status:</strong> ✅ Completato</div>
-                    <div><strong>Data:</strong> ${new Date().toLocaleDateString('it-IT')}</div>
-                    <div><strong>Ora:</strong> ${new Date().toLocaleTimeString('it-IT')}</div>
-                `;
+            // Controlla il metodo di pagamento
+            const paymentMethod = sessionStorage.getItem('paymentMethod');
+            const params = new URLSearchParams(window.location.search);
+            const orderId = params.get('token');
+
+            console.log('📋 Payment Method:', paymentMethod);
+            console.log('📋 Order ID (token):', orderId);
+
+            // Se è pagamento PayPal, cattura l'ordine
+            if (!paymentMethod || paymentMethod === 'paypal') {
+                if (orderId) {
+                    // Leggi i dati salvati in sessionStorage
+                    const paypalOrderData = JSON.parse(sessionStorage.getItem('paypalOrderData') || '{}');
+                    console.log('📦 PayPal Order Data from Session:', paypalOrderData);
+
+                    // Cattura l'ordine PayPal
+                    try {
+                        const token = getToken();
+                        console.log('🔑 Auth Token exist:', !!token);
+
+                        const capturePayload = {
+                            orderId: orderId,
+                            prenotazioneId: paypalOrderData.prenotazioneId,
+                            importo: paypalOrderData.importo
+                        };
+                        console.log('📤 Sending capture request:', capturePayload);
+
+                        const res = await fetch('/api/payments/paypal/confirm', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify(capturePayload)
+                        });
+
+                        const data = await res.json();
+                        console.log('📥 Capture Response:', { ok: res.ok, status: res.status, data });
+
+                        if (!res.ok || !data.success) {
+                            console.error('❌ Capture error:', data.error || 'Payment capture failed');
+                        } else {
+                            console.log('✅ Payment captured successfully!');
+                        }
+
+                        sessionStorage.removeItem('paypalOrderData');
+                    } catch (error) {
+                        console.error('❌ Error capturing PayPal order:', error);
+                    }
+                } else {
+                    console.warn('⚠️ No order token (token param) in URL for PayPal payment');
+                }
+            } else if (paymentMethod === 'card') {
+                console.log('✅ Card payment already processed');
+                // Card payment è già stato processato e salvato nel DB dal backend
             }
+
+            // Pulisci session storage
+            sessionStorage.removeItem('pendingPayment');
+            localStorage.removeItem('pendingPayment');
+            sessionStorage.removeItem('paymentMethod');
         });
 
         function goToDashboard() {
-            // Pulisci il sessionStorage del pagamento pendente
-            sessionStorage.removeItem('pendingPayment');
-            localStorage.removeItem('pendingPayment');
+            const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+            const userRole = (user.ruolo || '').toLowerCase();
             
-            // Reindirizza alla dashboard
-            window.location.href = '/pages/dashboardMentee.html';
+            if (userRole === 'mentor') {
+                window.location.href = '/pages/dashboardMentor.html';
+            } else if (userRole === 'mentee') {
+                window.location.href = '/pages/dashboardMentee.html';
+            } else {
+                window.location.href = '/pages/index.html';
+            }
         }
     </script>
-
-    <script src="../js/utils.js"></script>
 </body>
 </html>

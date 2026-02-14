@@ -23,37 +23,54 @@
         <a href="appArea.html">My Sessions</a>
         <a href="chat.html">Messages</a>
         <a href="search.html">Find Mentors</a>
-        <a href="#">My Profile</a>
         <a href="paymentHistory.html">Payment History</a>
     </div>
 
-    <div class="dashboard-container" style="margin-left: 220px;">
-        <div class="welcome-section">
-            <h1 id="greeting" style="margin-bottom: 10px;">Welcome, Mentee!</h1>
-            <p style="color: #666;">Continue your learning journey</p>
-        </div>
+    <div class="dashboard-container dashboard-wide">
+        <div class="welcome-section dashboard-hero">
+            <div class="dashboard-top-row">
+                <div class="dashboard-left-col">
+                    <div class="profile-avatar"></div>
+                    <div class="dashboard-left-copy">
+                        <h1 id="greeting" class="dashboard-greeting">Welcome, Mentee!</h1>
+                        <p class="dashboard-subtitle">Continue your learning journey</p>
+                    </div>
+                </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value" id="active-mentors">0</div>
-                <div class="stat-label">Active Mentors</div>
+                <div class="stat-card dashboard-profile-card dashboard-profile-card--mentee" id="profileInfo">
+                    <div class="dashboard-profile-grid">
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Full Name</div>
+                            <div id="profile-name" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Email</div>
+                            <div id="profile-email" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Date of Birth</div>
+                            <div id="profile-dob" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Occupation</div>
+                            <div id="profile-occupation" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div>
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Gender</div>
+                            <div id="profile-gender" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                        <div style="grid-column: 1 / -1;">
+                            <div style="color: #666; font-size: 14px; margin-bottom: 5px;">Bio</div>
+                            <div id="profile-bio" style="font-size: 16px; font-weight: 500;">-</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-value" id="sessions-completed">0</div>
-                <div class="stat-label">Sessions Completed</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="upcoming-sessions">0</div>
-                <div class="stat-label">Upcoming Sessions</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value" id="learning-time">0h</div>
-                <div class="stat-label">Total Learning Time</div>
-            </div>
+            <button id="editProfileBtn" class="submit-btn dashboard-edit-btn">Edit Profile</button>
         </div>
 
         <div class="section">
-            <div class="section-title">Upcoming Sessions</div>
+            <div class="section-title">Upcoming Confirmed Sessions</div>
             <p id="no-appointments" style="color: #666;">No upcoming sessions</p>
         </div>
     </div>
