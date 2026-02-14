@@ -115,7 +115,7 @@ class Mentor {
                 u."Cognome",
                 COALESCE(rv.media_recensioni, 0) as media_recensioni,
                 COALESCE(rv.numero_recensioni, 0) as numero_recensioni,
-                COALESCE(av.giorni_disponibili, ARRAY[]::int[]) as giorni_disponibili
+                COALESCE(av.giorni_disponibili, ARRAY[]::smallint[]) as giorni_disponibili
             FROM "Mentor" m
             JOIN "Utenti" u ON m."Id_Utente" = u."Id"
             LEFT JOIN (
@@ -181,7 +181,7 @@ class Mentor {
                         SELECT 1
                         FROM "Disponibilita" d
                         WHERE d."Id_Utente" = m."Id_Utente"
-                          AND d."Giorno" = ANY($${paramCount}::int[])
+                          AND d."Giorno" = ANY($${paramCount}::smallint[])
                     )
                 `;
                 values.push(selectedDays);

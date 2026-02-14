@@ -101,6 +101,7 @@ export const RicercaMentor = async (req, res) => {
       data: mentors,
     });
   } catch (error) {
+    console.error('RicercaMentor error:', error);
     res.status(500).json({ success: false, message: 'Error searching mentors' });
   }
 };
