@@ -1,5 +1,7 @@
 import Stripe from 'stripe';
-import { Client, Environment, OrdersController } from '@paypal/paypal-server-sdk';
+import paypalSdk from '@paypal/paypal-server-sdk';
+
+const { Client, Environment, OrdersController } = paypalSdk;
 
 // Configurazione Stripe
 export const stripe = process.env.STRIPE_SECRET_KEY

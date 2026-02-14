@@ -33,3 +33,9 @@ export class OrdersController {
     };
   }
 }
+
+export default {
+  Client,
+  Environment,
+  OrdersController,
+};
