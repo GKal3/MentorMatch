@@ -1,4 +1,9 @@
 import nodemailer from 'nodemailer';
+import dns from 'node:dns';
+
+if (typeof dns.setDefaultResultOrder === 'function') {
+  dns.setDefaultResultOrder('ipv4first');
+}
 
 // Debug: controlla se legge le variabili
 console.log('EMAIL_HOST:', process.env.EMAIL_HOST);
@@ -16,6 +21,9 @@ const transporter = nodemailer.createTransport({
   },
   connectionTimeout: 5000,
   family: 4,
+  tls: {
+    servername: process.env.EMAIL_HOST,
+  },
 });
 
 transporter.verify((error, success) => {
