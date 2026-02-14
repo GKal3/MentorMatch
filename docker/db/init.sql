@@ -61,6 +61,12 @@ CREATE TABLE IF NOT EXISTS "Lingue" (
   "Lingua" VARCHAR(120) UNIQUE NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS "OAuthTokens" (
+  "Provider" VARCHAR(80) PRIMARY KEY,
+  "Tokens" JSONB NOT NULL,
+  "Updated_At" TIMESTAMPTZ DEFAULT NOW()
+);
+
 INSERT INTO "Settore" ("Campo") VALUES
   ('Business'),
   ('Technology'),

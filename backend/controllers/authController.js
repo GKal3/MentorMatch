@@ -3,6 +3,7 @@ import Mentee from '../models/Mentee.js';
 import Mentor from '../models/Mentor.js';
 import { GeneraJWT } from '../middleware/auth.js';
 import EmailService from '../utils/emailService.js';
+import GoogleAuthService from '../utils/googleAuthService.js';
 
 const normalizzaGenere = (val) => {
   if (!val) return val;
@@ -217,4 +218,30 @@ export const Discon = async (req, res) => {
     success: true,
     message: 'Logout successful',
   });
+};
+
+export const AvviaAuthGoogle = async (_req, res) => {
+  try {
+    const authUrl = GoogleAuthService.getAuthUrl();
+    res.json({ success: true, authUrl });
+  } catch (error) {
+    console.error('Errore avvio Google OAuth:', error);
+    res.status(500).json({ success: false, message: 'Unable to start Google OAuth' });
+  }
+};
+
+export const CallbackAuthGoogle = async (req, res) => {
+  try {
+    const { code } = req.query;
+    if (!code) {
+      return res.status(400).send('Missing Google OAuth code.');
+    }
+
+    await GoogleAuthService.getAccessToken(code);
+
+    res.send('Google Calendar collegato con successo. Puoi chiudere questa pagina.');
+  } catch (error) {
+    console.error('Errore callback Google OAuth:', error);
+    res.status(500).send('Errore durante il collegamento Google Calendar.');
+  }
 };

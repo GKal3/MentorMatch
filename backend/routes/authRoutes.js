@@ -3,7 +3,7 @@ import multer from 'multer';
 import fs from 'fs';
 import { dirname, extname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { Accesso, RegMentor, RegMentee, Discon } from '../controllers/authController.js';
+import { Accesso, RegMentor, RegMentee, Discon, AvviaAuthGoogle, CallbackAuthGoogle } from '../controllers/authController.js';
 import { 
   validateMentorRegistration, 
   validateMenteeRegistration, 
@@ -39,5 +39,11 @@ router.post('/register/mentee', validateMenteeRegistration, RegMentee);
 
 // POST /api/auth/logout
 router.post('/logout', Discon);
+
+// GET /api/auth/google
+router.get('/google', AvviaAuthGoogle);
+
+// GET /api/auth/google/callback
+router.get('/google/callback', CallbackAuthGoogle);
 
 export default router;

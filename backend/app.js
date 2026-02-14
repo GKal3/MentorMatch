@@ -24,6 +24,8 @@ app.use(express.static(join(__dirname, '../frontend')));
 
 // Route API
 app.use('/api/auth', authRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/mentee', menteeRoutes);

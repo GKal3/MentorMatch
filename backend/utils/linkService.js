@@ -62,6 +62,7 @@ class LinkService {
    */
   static async createGoogleMeetLink(appointmentId, appointmentDate, mentorName, menteeName) {
     try {
+      await GoogleAuthService.ensureCredentials();
       const oauth2Client = GoogleAuthService.getOAuth2Client();
       const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
