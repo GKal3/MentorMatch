@@ -32,6 +32,10 @@ app.use('/api/mentee', menteeRoutes);
 app.use('/api/mentor', mentorRoutes);
 app.use('/api/messages', messageRoutes);
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ ok: true });
+});
+
 // Serve index.html per la root
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, '../frontend/pages/index.html'));
