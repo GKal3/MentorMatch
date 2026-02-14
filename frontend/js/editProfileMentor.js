@@ -127,7 +127,7 @@ async function loadProfile() {
     if (!user?.id) return;
 
     try {
-        const response = await fetch(`http://localhost:3000/api/mentor/personal/${user.id}`, {
+        const response = await fetch(`/api/mentor/personal/${user.id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -202,7 +202,7 @@ async function handleSave(e) {
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/mentor/personal/${user.id}`, {
+        const response = await fetch(`/api/mentor/personal/${user.id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

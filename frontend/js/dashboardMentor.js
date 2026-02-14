@@ -39,7 +39,7 @@ async function loadDashboardData() {
     
     try {
         // Carica dati personali del mentor
-        const response = await fetch(`http://localhost:3000/api/mentor/personal/${user.id}`, {
+        const response = await fetch(`/api/mentor/personal/${user.id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -82,7 +82,7 @@ async function loadPendingSessionsForMentor(token) {
     }
 
     try {
-        const res = await fetch('http://localhost:3000/api/mentor/appointments', {
+        const res = await fetch('/api/mentor/appointments', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 

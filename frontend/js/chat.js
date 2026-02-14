@@ -105,7 +105,7 @@ async function loadAllChats() {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     
     try {
-        const response = await fetch(`http://localhost:3000/api/messages/chats/${currentUser.id}`, {
+        const response = await fetch(`/api/messages/chats/${currentUser.id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -200,7 +200,7 @@ async function loadConversation(userId1, userId2) {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     
     try {
-        const response = await fetch(`http://localhost:3000/api/messages/conversation/${userId1}/${userId2}`, {
+        const response = await fetch(`/api/messages/conversation/${userId1}/${userId2}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -273,7 +273,7 @@ async function sendMessage() {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     
     try {
-        const response = await fetch('http://localhost:3000/api/messages/send', {
+        const response = await fetch('/api/messages/send', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

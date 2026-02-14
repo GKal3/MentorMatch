@@ -19,10 +19,21 @@ class Mentee {
   // Trova mentee per ID utente
   static async findByUserId(userId) {
     const query = `
-      SELECT m.*, u."Mail", u."Nome", u."Cognome", TO_CHAR(u."Data_Nascita", 'YYYY-MM-DD') AS "Data_Nascita", u."Genere"
-      FROM "Mentee" m
-      JOIN "Utenti" u ON m."Id_Utente" = u."Id"
-      WHERE m."Id_Utente" = $1
+      SELECT
+        u."Id" AS "Id_Utente",
+        u."Mail",
+        u."Nome",
+        u."Cognome",
+        u."Data_Nascita"::text AS "Data_Nascita",
+        u."Genere",
+        m."Id",
+        m."Occupazione",
+        m."Bio"
+      FROM "Utenti" u
+      LEFT JOIN "Mentee" m ON m."Id_Utente" = u."Id"
+      WHERE u."Id" = $1
+        AND u."Ruolo" = 'Mentee'
+      LIMIT 1
     `;
     const result = await pool.query(query, [userId]);
     return result.rows[0];

@@ -80,7 +80,7 @@ async function loadWeeklyAvailability() {
     const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
     
     try {
-        const response = await fetch(`http://localhost:3000/api/mentor/availability/${user.id}`, {
+        const response = await fetch(`/api/mentor/availability/${user.id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -393,7 +393,7 @@ async function deleteSavedRange(dayName, startTime, endTime) {
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/mentor/availability/${user.id}`, {
+        const response = await fetch(`/api/mentor/availability/${user.id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -541,7 +541,7 @@ async function saveWeeklyAvailability() {
     try {
         for (const item of rangesToDelete) {
             const dayNumber = dayNameToNumber[item.dayName];
-            const deleteResponse = await fetch(`http://localhost:3000/api/mentor/availability/${user.id}`, {
+            const deleteResponse = await fetch(`/api/mentor/availability/${user.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -568,7 +568,7 @@ async function saveWeeklyAvailability() {
         }
 
         if (allAvailableSlots.length > 0) {
-            const response = await fetch(`http://localhost:3000/api/mentor/availability/${user.id}`, {
+            const response = await fetch(`/api/mentor/availability/${user.id}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

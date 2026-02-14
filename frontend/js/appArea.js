@@ -29,7 +29,7 @@ function setupTabs() {
 async function loadAppointments() {
   const token = localStorage.getItem('token') || sessionStorage.getItem('token');
   try {
-    const res = await fetch('http://localhost:3000/api/mentee/appointments', {
+    const res = await fetch('/api/mentee/appointments', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await res.json();
@@ -228,7 +228,7 @@ async function cancelSession(appointmentId) {
 
   const token = getToken();
   try {
-    const res = await fetch(`http://localhost:3000/api/mentee/appointments/${appointmentId}/cancel`, {
+    const res = await fetch(`/api/mentee/appointments/${appointmentId}/cancel`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,

@@ -152,6 +152,8 @@ describe('Validation middleware', () => {
       organizzazione: 'Tech Co',
       esperienza: '5-10',
       prezzo: 50,
+      iban: 'IT60X0542811101000000123456',
+      accetta_commissione_piattaforma: true,
       settore: 'Software',
       lingua: 'Italiano',
       bio: 'Experienced mentor',
@@ -216,7 +218,8 @@ describe('Validation middleware', () => {
         body: {
           id_mentor: 1,
           giorno: '2026-03-15',
-          ora: '10:00',
+          ora_inizio: '10:00',
+          ora_fine: '11:00',
           link: '',
         },
       };
@@ -228,12 +231,13 @@ describe('Validation middleware', () => {
       expect(next).toHaveBeenCalled();
     });
 
-    test('should fail with past date', () => {
+    test('should fail when end time is before start time', () => {
       const req = {
         body: {
           id_mentor: 1,
-          giorno: '2020-01-01',
-          ora: '10:00',
+          giorno: '2026-03-15',
+          ora_inizio: '10:00',
+          ora_fine: '09:30',
         },
       };
       const res = {
@@ -252,7 +256,8 @@ describe('Validation middleware', () => {
         body: {
           id_mentor: 1,
           giorno: '2026-03-15',
-          ora: '25:99',
+          ora_inizio: '25:99',
+          ora_fine: '26:10',
         },
       };
       const res = {
@@ -267,14 +272,20 @@ describe('Validation middleware', () => {
     });
 
     test('should accept valid time formats', () => {
-      const times = ['09:00', '10:30', '23:59', '00:00'];
+      const timePairs = [
+        { ora_inizio: '09:00', ora_fine: '10:00' },
+        { ora_inizio: '10:30', ora_fine: '11:15' },
+        { ora_inizio: '00:00', ora_fine: '00:30' },
+        { ora_inizio: '22:30', ora_fine: '23:59' },
+      ];
 
-      times.forEach((ora) => {
+      timePairs.forEach(({ ora_inizio, ora_fine }) => {
         const req = {
           body: {
             id_mentor: 1,
             giorno: '2026-03-15',
-            ora,
+            ora_inizio,
+            ora_fine,
           },
         };
         const res = {};
@@ -323,7 +334,7 @@ describe('Validation middleware', () => {
       expect(res.status).toHaveBeenCalledWith(400);
       expect(res.json).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: expect.stringContaining('1 e 5'),
+          message: expect.stringContaining('between 1 and 5'),
         })
       );
     });

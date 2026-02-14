@@ -25,7 +25,7 @@ function setupFilters() {
 
 async function loadStats(mentorId, token) {
   try {
-    const res = await fetch(`http://localhost:3000/api/mentor/reviews-stats/${mentorId}`, {
+    const res = await fetch(`/api/mentor/reviews-stats/${mentorId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     const stats = res.ok ? await res.json() : {};
@@ -38,7 +38,7 @@ async function loadStats(mentorId, token) {
 
 async function loadReviews(mentorId, token) {
   try {
-    const res = await fetch(`http://localhost:3000/api/mentor/reviews/${mentorId}`, {
+    const res = await fetch(`/api/mentor/reviews/${mentorId}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     reviewsData = res.ok ? (await res.json()) || [] : [];

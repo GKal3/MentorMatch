@@ -128,12 +128,15 @@ function handleUnauthorizedSession() {
 function getApiBaseCandidates() {
 	const list = [];
 	const origin = window.location.origin || '';
+	const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
 	if (origin && !origin.startsWith('file://')) {
 		list.push(origin);
 	}
 
-	list.push('http://localhost:3000');
+	if (isLocal) {
+		list.push('http://localhost:3000');
+	}
 	list.push('');
 
 	return [...new Set(list)];

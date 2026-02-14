@@ -35,13 +35,14 @@ function updateChatLinks() {
 async function loadDashboardData() {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+    const apiBase = `${window.location.origin}/api`;
     
     console.log('User ID:', user.id);
     console.log('Token:', token);
     
     try {
         // Carica dati personali del mentee
-        const response = await fetch(`http://localhost:3000/api/mentee/personal/${user.id}`, {
+        const response = await fetch(`${apiBase}/mentee/personal/${user.id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -69,6 +70,7 @@ async function loadDashboardData() {
 }
 
 async function loadUpcomingSessionsForMentee(token) {
+    const apiBase = `${window.location.origin}/api`;
     const titleEl = document.querySelector('.section .section-title');
     if (titleEl) titleEl.textContent = 'Upcoming Confirmed Sessions';
 
@@ -84,7 +86,7 @@ async function loadUpcomingSessionsForMentee(token) {
     }
 
     try {
-        const res = await fetch('http://localhost:3000/api/mentee/appointments', {
+        const res = await fetch(`${apiBase}/mentee/appointments`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
 

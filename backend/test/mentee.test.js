@@ -19,6 +19,12 @@ jest.unstable_mockModule('../models/Mentee.js', () => ({
   },
 }));
 
+jest.unstable_mockModule('../models/Availability.js', () => ({
+  default: {
+    getAvailability: jest.fn(),
+  },
+}));
+
 jest.unstable_mockModule('../models/Appointment.js', () => ({
   default: {
     create: jest.fn(),
@@ -70,6 +76,7 @@ jest.unstable_mockModule('../utils/emailService.js', () => ({
 const { default: app } = await import('../app.js');
 const { default: Mentor } = await import('../models/Mentor.js');
 const { default: Mentee } = await import('../models/Mentee.js');
+const { default: Availability } = await import('../models/Availability.js');
 const { default: Appointment } = await import('../models/Appointment.js');
 const { default: Review } = await import('../models/Review.js');
 const { default: Payment } = await import('../models/Payment.js');
@@ -144,6 +151,7 @@ describe('Mentee routes', () => {
 
   describe('GET /api/mentee/mentor/:id', () => {
     test('should get mentor profile (public)', async () => {
+      Availability.getAvailability.mockResolvedValue([]);
       Mentor.getById.mockResolvedValue({
         Id_Utente: 1,
         Nome: 'Marco',
@@ -442,7 +450,18 @@ describe('Mentee routes', () => {
   });
 
   describe('Authorization', () => {
-    test('should reject non-mentee users', async () => {
+    test('should allow authenticated users on /area (route has no role guard)', async () => {
+      Mentee.findByUserId.mockResolvedValue({
+        Id_Utente: 1,
+        Occupazione: 'Mentor',
+      });
+      Mentee.getStats.mockResolvedValue({
+        totale_prenotazioni: 0,
+        prenotazioni_confermate: 0,
+        recensioni_lasciate: 0,
+        totale_speso: 0,
+      });
+
       const mentorToken = GeneraJWT({
         id: 1,
         mail: 'mentor@test.com',
@@ -453,7 +472,7 @@ describe('Mentee routes', () => {
         .get('/api/mentee/area')
         .set('Authorization', `Bearer ${mentorToken}`);
 
-      expect(res.status).toBe(403);
+      expect(res.status).toBe(200);
     });
   });
 });

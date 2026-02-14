@@ -51,7 +51,7 @@ async function loadAppointments() {
     const token = getToken();
     
     try {
-        const response = await fetch('http://localhost:3000/api/mentor/appointments', {
+        const response = await fetch('/api/mentor/appointments', {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -437,7 +437,7 @@ async function saveAppointmentStatus(newStatus) {
     const appointmentId = selectedAppointment.Id || selectedAppointment.id;
 
     try {
-        const response = await fetch(`http://localhost:3000/api/mentor/appointments/${appointmentId}/status`, {
+        const response = await fetch(`/api/mentor/appointments/${appointmentId}/status`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${token}`,
