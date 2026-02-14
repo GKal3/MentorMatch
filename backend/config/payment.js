@@ -1,7 +1,8 @@
 import Stripe from 'stripe';
-import paypalSdk from '@paypal/paypal-server-sdk';
+import { createRequire } from 'node:module';
 
-const { Client, Environment, OrdersController } = paypalSdk;
+const require = createRequire(import.meta.url);
+const { Client, Environment, OrdersController } = require('@paypal/paypal-server-sdk');
 
 // Configurazione Stripe
 export const stripe = process.env.STRIPE_SECRET_KEY
