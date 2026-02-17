@@ -165,7 +165,7 @@ class Payment {
             ) AS "Metodo_Pagamento",
             CASE
                 WHEN LOWER(COALESCE(pag."Stato_Payout", '')) = 'refunded' THEN 0
-                WHEN LOWER(p."Stato") LIKE '%cancel%' THEN 0
+                WHEN p."Stato" = 'Cancelled' THEN 0
                 ELSE COALESCE(
                     NULLIF(to_jsonb(pag)->>'Importo_Mentor', '')::numeric,
                     pag."Importo"
