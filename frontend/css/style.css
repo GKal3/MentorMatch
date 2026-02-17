@@ -1510,21 +1510,6 @@ footer {
         padding: 0 20px;
     }
 
-    .forgot-password {
-        text-align: right;
-        margin-top: 5px;
-    }
-
-    .forgot-password a {
-        color: var(--green);
-        font-size: 14px;
-        text-decoration: none;
-    }
-
-    .forgot-password a:hover {
-        text-decoration: underline;
-    }
-
     .remember-me {
         display: flex;
         align-items: center;
