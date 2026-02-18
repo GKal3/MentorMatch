@@ -148,13 +148,13 @@ function renderReviewCard(review) {
   const date = formatDate(review.Data || review.created_at || null);
 
   return `
-    <div class="review-card">
+    <div class="review-card" style="margin-bottom: 16px;">
       <div class="review-header">
         <div class="reviewer-info">
           <div class="reviewer-avatar">${escapeHtml(initials)}</div>
           <div>
             <div class="reviewer-name">${escapeHtml(reviewerName)}</div>
-            <div class="review-date">${escapeHtml(date || 'Recent')}</div>
+            <div class="review-date">${escapeHtml(date)}</div>
           </div>
         </div>
         <div class="review-rating">
